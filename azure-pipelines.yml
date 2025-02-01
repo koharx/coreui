@@ -1,17 +1,25 @@
 trigger:
-- develop
+  - develop  # Runs pipeline on push to main branch
 
 pool:
   name: 'sso'
   vmImage: 'ssoui'
 
 steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '20.x'
-  displayName: 'Install Node.js'
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '18.x'  # Use the latest stable Node.js version
 
-- script: |
-    npm install
-    npm run build
-  displayName: 'npm install and build'
+  - script: |
+      npm install
+      npm run build
+    displayName: 'Install Dependencies & Build React App'
+
+  - task: AzureCLI@2
+    displayName: 'Upload to Azure Storage'
+    inputs:
+      azureSubscription: 'AzureDevOpsConnection'  # Service connection name
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az storage blob upload-batch --account-name ssoui
