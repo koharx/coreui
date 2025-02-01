@@ -15,11 +15,23 @@ steps:
       npm run build
     displayName: 'Install Dependencies & Build React App'
 
-  - task: AzureCLI@2
-    displayName: 'Upload to Azure Storage'
+  - task: ArchiveFiles@2
+    displayName: 'Archive React Build Files'
     inputs:
-      azureSubscription: 'AzureDevOpsConnection'  # Set up in Azure DevOps
-      scriptType: 'bash'
-      scriptLocation: 'inlineScript'
-      inlineScript: |
-        az storage blob upload-batch --account-name ssoui
+      rootFolderOrFile: '$(Build.SourcesDirectory)/build'
+      includeRootFolder: false
+      archiveType: 'zip'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/react-build.zip'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact'
+    inputs:
+      pathToPublish: '$(Build.ArtifactStagingDirectory)/react-build.zip'
+      artifactName: 'drop'
+
+  - task: AzureWebApp@1
+    displayName: 'Deploy React App to Azure App Service'
+    inputs:
+      azureSubscription: 'AzureDevOpsConnection'
+      appName: 'ssoui' 
+      package: '$(Pipeline.Workspace)/drop/react-build.zip'
