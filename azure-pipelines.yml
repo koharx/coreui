@@ -11,6 +11,8 @@ steps:
       versionSpec: '18.x'  # Use the latest stable Node.js version
 
   - script: |
+      cd $(Build.SourcesDirectory)
+      ls -la  # List files to check if build exists
       npm install
       npm run build
     displayName: 'Install Dependencies & Build React App'
