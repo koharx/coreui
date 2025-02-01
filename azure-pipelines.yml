@@ -18,7 +18,7 @@ steps:
   - task: AzureCLI@2
     displayName: 'Upload to Azure Storage'
     inputs:
-      azureSubscription: 'AzureDevOpsConnection'  # Service connection name
+      azureSubscription: 'AzureDevOpsConnection'  # Set up in Azure DevOps
       scriptType: 'bash'
       scriptLocation: 'inlineScript'
       inlineScript: |
