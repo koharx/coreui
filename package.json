@@ -1,12 +1,11 @@
 {
-  "name": "SSO-Client",
+  "name": "ssoui",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
     "start": "webpack serve --mode development",
-    "build": "webpack --mode production",
-    "start:prod": "pm2 serve build 8080 --spa"
+    "build": "webpack --mode production"
   },
   "dependencies": {
     "@emotion/react": "^11.13.5",

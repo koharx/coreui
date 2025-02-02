@@ -7,6 +7,9 @@ WORKDIR /usr/src/app
 # Copy package.json and package-lock.json first for faster caching
 COPY package*.json ./
 
+# Install pm2 globally
+RUN npm install -g pm2
+
 # Install dependencies, including webpack
 RUN npm install --production
 
