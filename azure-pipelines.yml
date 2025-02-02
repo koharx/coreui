@@ -19,10 +19,13 @@ stages:
       inputs:
         versionSpec: '18.x'  # Use the latest LTS version
 
+    - script: rm -rf node_modules package-lock.json build
+      displayName: 'Clean Old Files'
+
     - script: |
         npm install
       displayName: 'Install Dependencies'
-
+      
     - script: |
         npm run build
       displayName: 'Build React App'
