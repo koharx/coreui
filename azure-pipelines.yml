@@ -35,3 +35,29 @@ stages:
       inputs:
         pathToPublish: '$(Build.SourcesDirectory)/build'
         artifactName: 'drop'
+
+- stage: Deploy
+  displayName: 'Deploy React App'
+  dependsOn: Build  # Runs only if Build is successful
+  condition: succeeded()
+  jobs:
+  - deployment: DeployToAzure
+    displayName: 'Deploy to Azure Static Web App'
+    environment: 'Production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadBuildArtifacts@0
+            displayName: 'Download Build Artifacts'
+            inputs:
+              artifactName: 'drop'
+              downloadPath: '$(Pipeline.Workspace)'
+
+          - task: AzureWebApp@1
+            displayName: 'Deploy to Azure Web App'
+            inputs:
+              azureSubscription: 'AzureDevOpsConnection'
+              appName: 'ssoui'
+              package: '$(Pipeline.Workspace)/drop'
+              runtimeStack: 'NODE|18-lts'
