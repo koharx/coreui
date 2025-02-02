@@ -1,13 +1,11 @@
 trigger:
-  branches:
-    include:
-      - develop
+- develop
 
 pool:
-  name: 'sso'
-  vmImage: 'ssoui'
+  name: sso
 
 stages:
+
 - stage: Build
   displayName: 'Build and Test React App'
   jobs:
@@ -17,47 +15,27 @@ stages:
     - task: NodeTool@0
       displayName: 'Install Node.js'
       inputs:
-        versionSpec: '18.x'  # Use the latest LTS version
+        versionSpec: '18.x'
 
     - script: rm -rf node_modules package-lock.json build
       displayName: 'Clean Old Files'
 
-    - script: |
-        npm install
+    - script: npm install
       displayName: 'Install Dependencies'
-      
-    - script: |
-        npm run build
+
+    - script: npm run test -- --watch=false
+      displayName: 'Run Tests'
+
+    - script: npm run build
       displayName: 'Build React App'
+      env:
+        CI: false
+
+    - script: ls -R $(Build.SourcesDirectory)
+      displayName: 'List All Files After Build'  # Debugging step
 
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Build Artifacts'
       inputs:
-        pathToPublish: 'build'  # React build folder
+        pathToPublish: '$(Build.SourcesDirectory)/build'
         artifactName: 'drop'
-
-- stage: Deploy
-  displayName: 'Deploy React App'
-  dependsOn: Build  # Runs only if Build is successful
-  condition: succeeded()
-  jobs:
-  - deployment: DeployToAzure
-    displayName: 'Deploy to Azure Static Web App'
-    environment: 'Production'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: DownloadBuildArtifacts@0
-            displayName: 'Download Build Artifacts'
-            inputs:
-              artifactName: 'drop'
-              downloadPath: '$(Pipeline.Workspace)'
-
-          - task: AzureWebApp@1
-            displayName: 'Deploy to Azure Web App'
-            inputs:
-              azureSubscription: 'AzureDevOpsConnection'
-              appName: 'ssoui'
-              package: '$(Pipeline.Workspace)/drop'
-              runtimeStack: 'NODE|18-lts'
