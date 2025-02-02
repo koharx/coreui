@@ -7,35 +7,58 @@ pool:
   name: 'sso'
   vmImage: 'ssoui'
 
-steps:
-  - task: NodeTool@0
-    inputs:
-      versionSpec: '18.x'
+stages:
+- stage: Build
+  displayName: 'Build and Test React App'
+  jobs:
+  - job: Build
+    displayName: 'Install, Test & Build'
+    steps:
+    - task: NodeTool@0
+      displayName: 'Install Node.js'
+      inputs:
+        versionSpec: '18.x'  # Use the latest LTS version
 
-  - script: |
-      cd $(Build.SourcesDirectory)
-      ls -la  # List files to check if build exists
-      npm install
-      npm run build
-    displayName: 'Install Dependencies & Build React App'
+    - script: |
+        npm install
+      displayName: 'Install Dependencies'
 
-  - task: ArchiveFiles@2
-    displayName: 'Archive React Build Files'
-    inputs:
-      rootFolderOrFile: '$(Build.SourcesDirectory)/build'
-      includeRootFolder: false
-      archiveType: 'zip'
-      archiveFile: '$(Build.ArtifactStagingDirectory)/react-build.zip'
+    - script: |
+        npm run test -- --watch=false
+      displayName: 'Run Tests'
 
-  - task: PublishBuildArtifacts@1
-    displayName: 'Publish Artifact'
-    inputs:
-      pathToPublish: '$(Build.ArtifactStagingDirectory)/react-build.zip'
-      artifactName: 'drop'
+    - script: |
+        npm run build
+      displayName: 'Build React App'
 
-  - task: AzureWebApp@1
-    displayName: 'Deploy React App to Azure App Service'
-    inputs:
-      azureSubscription: 'AzureDevOpsConnection'
-      appName: 'ssoui' 
-      package: '$(Pipeline.Workspace)/drop/react-build.zip'
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Build Artifacts'
+      inputs:
+        pathToPublish: 'build'  # React build folder
+        artifactName: 'drop'
+
+- stage: Deploy
+  displayName: 'Deploy React App'
+  dependsOn: Build  # Runs only if Build is successful
+  condition: succeeded()
+  jobs:
+  - deployment: DeployToAzure
+    displayName: 'Deploy to Azure Static Web App'
+    environment: 'Production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadBuildArtifacts@0
+            displayName: 'Download Build Artifacts'
+            inputs:
+              artifactName: 'drop'
+              downloadPath: '$(Pipeline.Workspace)'
+
+          - task: AzureWebApp@1
+            displayName: 'Deploy to Azure Web App'
+            inputs:
+              azureSubscription: 'AzureDevOpsConnection'
+              appName: 'ssoui'
+              package: '$(Pipeline.Workspace)/drop'
+              runtimeStack: 'NODE|18-lts'
