@@ -2,10 +2,9 @@ trigger:
 - develop
 
 pool:
-  name: sso
+  name: sso  # Your self-hosted agent
 
 stages:
-
 - stage: Build
   displayName: 'Build and Test React App'
   jobs:
@@ -23,7 +22,7 @@ stages:
     - script: npm install
       displayName: 'Install Dependencies'
 
-    - script: npm run build
+    - script: npm run build -- --output-path=build
       displayName: 'Build React App'
       env:
         CI: false
