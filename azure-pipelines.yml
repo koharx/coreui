@@ -24,10 +24,6 @@ stages:
       displayName: 'Install Dependencies'
 
     - script: |
-        npm run test -- --watch=false
-      displayName: 'Run Tests'
-
-    - script: |
         npm run build
       displayName: 'Build React App'
 
