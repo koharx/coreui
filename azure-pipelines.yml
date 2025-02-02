@@ -1,5 +1,7 @@
 trigger:
-  - develop  # Runs pipeline on push to main branch
+  branches:
+    include:
+      - develop
 
 pool:
   name: 'sso'
@@ -8,7 +10,7 @@ pool:
 steps:
   - task: NodeTool@0
     inputs:
-      versionSpec: '18.x'  # Use the latest stable Node.js version
+      versionSpec: '18.x'
 
   - script: |
       cd $(Build.SourcesDirectory)
