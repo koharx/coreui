@@ -12,28 +12,23 @@ stages:
     displayName: 'Install, Test & Build'
     steps:
     - task: NodeTool@0
-      displayName: 'Install Node.js'
       inputs:
         versionSpec: '18.x'
 
-    - script: rm -rf node_modules package-lock.json build
-      displayName: 'Clean Old Files'
-
-    - script: npm install
-      displayName: 'Install Dependencies'
-
-    - script: npm run build -- --output-path=build
+    - script: |
+        npm install
+        npm run build
       displayName: 'Build React App'
-      env:
-        CI: false
 
-    - script: ls -R $(Build.SourcesDirectory)
-      displayName: 'List All Files After Build'  # Debugging step
+    - task: ArchiveFiles@2
+      inputs:
+        rootFolderOrFile: '$(Build.SourcesDirectory)/build'
+        includeRootFolder: false
+        archiveFile: '$(Build.ArtifactStagingDirectory)/ssoui.zip'
 
     - task: PublishBuildArtifacts@1
-      displayName: 'Publish Build Artifacts'
       inputs:
-        pathToPublish: '$(Build.SourcesDirectory)/build'
+        pathToPublish: '$(Build.ArtifactStagingDirectory)/ssoui.zip'
         artifactName: 'drop'
 
 - stage: Deploy
@@ -59,7 +54,7 @@ stages:
             inputs:
               azureSubscription: 'AzureDevOpsConnection'
               appName: 'ssoui'
-              package: '$(Pipeline.Workspace)/drop'
+              package: "$(Pipeline.Workspace)/drop/**/*.zip"
               runtimeStack: 'NODE|18-lts'
             
           - task: AzureCLI@2
