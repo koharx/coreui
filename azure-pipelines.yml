@@ -69,4 +69,4 @@ stages:
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
-                az webapp config appsettings set --resource-group "ssoauthservice_group" --name "ssoauthservice" --settings WEBSITE_RUN_FROM_PACKAGE=0
+                az webapp config appsettings set --resource-group "ssoauthservice_group" --name "ssoui" --settings WEBSITE_RUN_FROM_PACKAGE=0
