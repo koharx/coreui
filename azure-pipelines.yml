@@ -61,3 +61,12 @@ stages:
               appName: 'ssoui'
               package: '$(Pipeline.Workspace)/drop'
               runtimeStack: 'NODE|18-lts'
+            
+          - task: AzureCLI@2
+            displayName: "Set WEBSITE_RUN_FROM_PACKAGE to 0"
+            inputs:
+              azureSubscription: "AzureDevOpsConnection"
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                az webapp config appsettings set --resource-group "ssoauthservice_group" --name "ssoauthservice" --settings WEBSITE_RUN_FROM_PACKAGE=0
