@@ -1,5 +1,5 @@
 # Set the working directory
-WORKDIR /src
+WORKDIR /
 # Copy the package.json and package-lock.json files
 COPY package*.json ./
 # Install the dependencies
