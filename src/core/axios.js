@@ -1,10 +1,7 @@
 import axios from 'axios';
 
-// const url = process.env.REACT_APP_API_URL;
-// console.log(url);
-
 const apiClient = axios.create({
-  baseURL: "http://localhost:5048", 
+  baseURL: process.env.AUTHSERVICE_URL, 
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
