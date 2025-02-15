@@ -95,8 +95,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
     <CircularProgressBar showLoader="true" />;
     const user = await login(userData);
     if (user.success) {
-      // <CircularProgressBar showLoader="false" />;
-      console.log(user.data.token);
+      <CircularProgressBar showLoader="false" />;
       sessionStorage.setItem("accessToken", user.data.token);
       navigate("Blog");
     } else {

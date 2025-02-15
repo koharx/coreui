@@ -28,12 +28,11 @@ apiClient.interceptors.response.use(
     if(response.status == 200){
       customResponse.data = response.data;
       customResponse.success = true;
-      return customResponse; 
     }
     else{
       customResponse.success = false;
-      return customResponse; 
     }
+     return customResponse; 
   },
   (error) => {
     if (error.response) {
