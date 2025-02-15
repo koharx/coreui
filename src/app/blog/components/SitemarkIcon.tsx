@@ -1,5 +1,5 @@
-import * as React from 'react';
-import SvgIcon from '@mui/material/SvgIcon';
+import * as React from "react";
+import SvgIcon from "@mui/material/SvgIcon";
 
 export default function SitemarkIcon() {
   return (
@@ -9,7 +9,7 @@ export default function SitemarkIcon() {
         height={19}
         viewBox="0 0 86 19"
         fill="none"
-        xmlns="http://www.w3.org/2000/svg"
+        xmlns="../public/images/accelerate-svgrepo-com.svg"
       >
         <path
           fill="#B4C0D3"

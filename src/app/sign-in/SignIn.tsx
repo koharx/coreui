@@ -19,6 +19,7 @@ import AppTheme from "../shared-theme/AppTheme";
 import ColorModeSelect from "../shared-theme/ColorModeSelect";
 import { login } from "../../service/userService";
 import { useNavigate } from "react-router-dom";
+import CircularProgressBar from "../spinner/CircularSpinner";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -91,10 +92,15 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
       password: data.get("password"),
       domain: "",
     };
-
-    const token = await login(userData);
-    if (token === "Token") {
+    <CircularProgressBar showLoader="true" />;
+    const user = await login(userData);
+    if (user.success) {
+      // <CircularProgressBar showLoader="false" />;
+      console.log(user.data.token);
+      sessionStorage.setItem("accessToken", user.data.token);
       navigate("Blog");
+    } else {
+      <CircularProgressBar showLoader="false" />;
     }
   };
 
