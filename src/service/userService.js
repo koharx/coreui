@@ -2,9 +2,12 @@ import apiClient from '../core/axios';
 
 export const login = async (data) => {
   try {
-    return await apiClient.post('/api/auth/login', data);
+    const response = await apiClient.post('/api/auth/login', data);
+    console.log(response);
+    return response;
   } catch (error) {
     console.error('Error Fetching User Data:', error);
+    throw error;
   }
 }
 

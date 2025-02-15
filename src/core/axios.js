@@ -10,7 +10,7 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('authToken');
+    const token = sessionStorage.getItem("accessToken");
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
@@ -24,14 +24,23 @@ apiClient.interceptors.request.use(
 
 apiClient.interceptors.response.use(
   (response) => {
-    return response.data; 
+    const customResponse = {};
+    if(response.status == 200){
+      customResponse.data = response.data;
+      customResponse.success = true;
+      return customResponse; 
+    }
+    else{
+      customResponse.success = false;
+      return customResponse; 
+    }
   },
   (error) => {
     if (error.response) {
       console.error('Response Error:', error.response.data);
       if (error.response.status === 401) {
         console.error('Unauthorized! Redirecting to login...');
-        window.location.href = '/login'; 
+        window.location.href = '/'; 
       }
     } else if (error.request) {
       console.error('No Response Received:', error.request);
