@@ -80,24 +80,28 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    // if (emailError || passwordError) {
-    //   event.preventDefault();
-    //   return;
-    // }
-
+    if (emailError || passwordError) {
+      event.preventDefault();
+      return;
+    }
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const userData = {
       username: data.get("email"),
       password: data.get("password"),
-      domain: "",
     };
     <CircularProgressBar showLoader="true" />;
     const user = await login(userData);
     if (user.success) {
       <CircularProgressBar showLoader="false" />;
-      sessionStorage.setItem("accessToken", user.data.token);
-      navigate("Blog");
+      const queryParams = new URLSearchParams(window.location.search);
+      const redirectUrl = queryParams.get("redirect_uri");
+      if (redirectUrl) {
+        window.location.href = `${redirectUrl}?token=${user.data.token}`;
+      } else {
+        navigate("Blog");
+        sessionStorage.setItem("accessToken", user.data.token);
+      }
     } else {
       <CircularProgressBar showLoader="false" />;
     }

@@ -41,7 +41,7 @@ module.exports = (env) => {
             devMiddleware: {
                 publicPath: '/', // Serve the bundle from memory, not file system
             },
-            port: 3000,
+            port: 3001,
             hot: true,
             historyApiFallback: true, // Ensures all routes go to index.html (useful for SPA)
         },
