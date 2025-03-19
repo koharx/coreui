@@ -99,7 +99,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
       if (redirectUrl) {
         window.location.href = `${redirectUrl}?token=${user.data.token}`;
       } else {
-        //navigate("Blog");
+        navigate("Blog");
         sessionStorage.setItem("accessToken", user.data.token);
       }
     } else {
