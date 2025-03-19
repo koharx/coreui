@@ -11,9 +11,10 @@ import MenuItem from "@mui/material/MenuItem";
 import Drawer from "@mui/material/Drawer";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
-import Sitemark from "./SitemarkIcon";
 import ColorModeIconDropdown from "../../shared-theme/ColorModeIconDropdown";
 import Link from "@mui/material/Link";
+import { useAuth } from "../../../core/authcontext";
+import { useNavigate } from "react-router-dom";
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   display: "flex",
@@ -33,6 +34,8 @@ const StyledToolbar = styled(Toolbar)(({ theme }) => ({
 
 export default function AppAppBar() {
   const [open, setOpen] = React.useState(false);
+  const { isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
 
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
@@ -40,6 +43,11 @@ export default function AppAppBar() {
 
   const signUpClicked = () => {
     console.log("Test");
+  };
+
+  const logoutClicked = () => {
+    logout();
+    navigate("/");
   };
 
   return (
@@ -58,7 +66,6 @@ export default function AppAppBar() {
           <Box
             sx={{ flexGrow: 1, display: "flex", alignItems: "center", px: 0 }}
           >
-            <Sitemark />
             <Box sx={{ display: { xs: "none", md: "flex" } }}>
               <Button variant="text" color="info" size="small">
                 Features
@@ -90,21 +97,41 @@ export default function AppAppBar() {
               </Button>
             </Box>
           </Box>
-          <Box
-            sx={{
-              display: { xs: "none", md: "flex" },
-              gap: 1,
-              alignItems: "center",
-            }}
-          >
-            <Button color="primary" variant="text" size="small">
-              Sign in
-            </Button>
-            <Button color="primary" variant="contained" size="small">
-              Sign up
-            </Button>
-            <ColorModeIconDropdown />
-          </Box>
+          {isAuthenticated ? (
+            <Box
+              sx={{
+                display: { xs: "none", md: "flex" },
+                gap: 1,
+                alignItems: "center",
+              }}
+            >
+              <Button
+                color="primary"
+                variant="text"
+                size="small"
+                onClick={logoutClicked}
+              >
+                Logout
+              </Button>
+              <ColorModeIconDropdown />
+            </Box>
+          ) : (
+            <Box
+              sx={{
+                display: { xs: "none", md: "flex" },
+                gap: 1,
+                alignItems: "center",
+              }}
+            >
+              <Button color="primary" variant="text" size="small">
+                Sign in
+              </Button>
+              <Button color="primary" variant="contained" size="small">
+                Sign up
+              </Button>
+              <ColorModeIconDropdown />
+            </Box>
+          )}
           <Box sx={{ display: { xs: "flex", md: "none" }, gap: 1 }}>
             <ColorModeIconDropdown size="medium" />
             <IconButton aria-label="Menu button" onClick={toggleDrawer(true)}>

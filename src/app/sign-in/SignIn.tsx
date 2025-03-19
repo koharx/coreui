@@ -17,9 +17,10 @@ import ForgotPassword from "./ForgotPassword";
 import { GoogleIcon, FacebookIcon, SitemarkIcon } from "./CustomIcons";
 import AppTheme from "../shared-theme/AppTheme";
 import ColorModeSelect from "../shared-theme/ColorModeSelect";
-import { login } from "../../service/userService";
 import { useNavigate } from "react-router-dom";
 import CircularProgressBar from "../spinner/CircularSpinner";
+import { useAuth } from "../../core/authcontext";
+import { userLogin } from "../../service/userService";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -71,6 +72,9 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
   const [open, setOpen] = React.useState(false);
   const navigate = useNavigate();
   const [showLoader, setShowLoader] = React.useState(false);
+
+  const { login, isAuthenticated } = useAuth();
+
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -91,23 +95,27 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
       password: data.get("password"),
     };
     setShowLoader(true);
-    const user = await login(userData);
+    const user = await userLogin(userData);
     if (user.success) {
       setShowLoader(false);
       const queryParams = new URLSearchParams(window.location.search);
       const redirectUrl = queryParams.get("redirect_uri");
       if (redirectUrl) {
-        window.location.href = `${redirectUrl}?token=${user.data.token}`;
+        window.location.href = `${redirectUrl}?token=${user.data.accessToken}`;
       } else {
-        navigate("Blog");
-        sessionStorage.setItem("accessToken", user.data.token);
+        login(user.data.accessToken);
+        navigate("/blog");
       }
     } else {
       setShowLoader(false);
     }
   };
 
-  React.useEffect(() => {}, []);
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/blog");
+    }
+  }, [isAuthenticated, navigate]);
 
   const validateInputs = () => {
     const email = document.getElementById("email") as HTMLInputElement;
@@ -132,7 +140,6 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
       setPasswordError(false);
       setPasswordErrorMessage("");
     }
-
     return isValid;
   };
 

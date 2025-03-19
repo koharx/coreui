@@ -1,7 +1,13 @@
 import CircularProgress from "@mui/material/CircularProgress";
 import React from "react";
 
-export default function CircularProgressBar(showLoader: boolean) {
+interface CircularProgressBarProps {
+  showLoader: boolean;
+}
+
+export default function CircularProgressBar({
+  showLoader,
+}: CircularProgressBarProps) {
   return (
     showLoader && (
       <div
@@ -18,7 +24,7 @@ export default function CircularProgressBar(showLoader: boolean) {
           zIndex: 9999, // Ensure it's above other elements
         }}
       >
-        <CircularProgress />;
+        <CircularProgress />
       </div>
     )
   );

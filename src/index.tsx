@@ -1,17 +1,17 @@
 import React from "react";
 import ReactDOM from "react-dom/client"; // Ensure you're importing from 'react-dom/client'
 import App from "./App";
-//import './styles/index.css';
-//import { ThemeProvider } from './app/providers/ThemeProvider';
+import { AlertProvider } from "./core/alerts/AlertContext";
+import { AuthProvider } from "./core/authcontext";
 
 const rootElement = document.getElementById("root");
 if (rootElement) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
-    //<ThemeProvider>
     <React.StrictMode>
-      <App />
+      <AlertProvider>
+        <App />
+      </AlertProvider>
     </React.StrictMode>
-    //</ThemeProvider>
   );
 }
