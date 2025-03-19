@@ -1,18 +1,25 @@
-import * as React from "react";
 import CircularProgress from "@mui/material/CircularProgress";
-import Box from "@mui/material/Box";
+import React from "react";
 
-export default function CircularProgressBar(props: { showLoader: boolean }) {
-  return props.showLoader ? (
-    <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      height="100vh"
-    >
-      <CircularProgress size={60} thickness={4} />
-    </Box>
-  ) : (
-    <></>
+export default function CircularProgressBar(showLoader: boolean) {
+  return (
+    showLoader && (
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          zIndex: 9999, // Ensure it's above other elements
+        }}
+      >
+        <CircularProgress />;
+      </div>
+    )
   );
 }

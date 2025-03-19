@@ -70,7 +70,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
   const [open, setOpen] = React.useState(false);
   const navigate = useNavigate();
-
+  const [showLoader, setShowLoader] = React.useState(false);
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -90,10 +90,10 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
       username: data.get("email"),
       password: data.get("password"),
     };
-    <CircularProgressBar showLoader="true" />;
+    setShowLoader(true);
     const user = await login(userData);
     if (user.success) {
-      <CircularProgressBar showLoader="false" />;
+      setShowLoader(false);
       const queryParams = new URLSearchParams(window.location.search);
       const redirectUrl = queryParams.get("redirect_uri");
       if (redirectUrl) {
@@ -103,7 +103,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
         sessionStorage.setItem("accessToken", user.data.token);
       }
     } else {
-      <CircularProgressBar showLoader="false" />;
+      setShowLoader(false);
     }
   };
 
@@ -250,6 +250,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             </Typography>
           </Box>
         </Card>
+        {showLoader && <CircularProgressBar showLoader={showLoader} />}
       </SignInContainer>
     </AppTheme>
   );
