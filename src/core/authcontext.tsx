@@ -5,6 +5,7 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
+import getUsernameFromToken from "./token";
 
 type AuthContextType = {
   isAuthenticated: boolean;
@@ -18,17 +19,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   useEffect(() => {
-    const token = sessionStorage.getItem("accessToken");
+    const token = localStorage.getItem("accessToken");
     setIsAuthenticated(!!token);
   }, []);
 
   const login = (token: string) => {
-    sessionStorage.setItem("accessToken", token);
+    localStorage.setItem("accessToken", token);
     setIsAuthenticated(true);
+    const username = getUsernameFromToken(token);
+    if (username) {
+      localStorage.setItem("username", username);
+    }
   };
 
   const logout = () => {
-    sessionStorage.removeItem("accessToken");
+    localStorage.removeItem("accessToken");
     setIsAuthenticated(false);
   };
 
