@@ -17,9 +17,10 @@ import ForgotPassword from "./ForgotPassword";
 import { GoogleIcon, FacebookIcon, SitemarkIcon } from "./CustomIcons";
 import AppTheme from "../shared-theme/AppTheme";
 import ColorModeSelect from "../shared-theme/ColorModeSelect";
-import { login } from "../../service/userService";
+import { login } from "../../service/userservice";
 import { useNavigate } from "react-router-dom";
 import CircularProgressBar from "../spinner/CircularSpinner";
+import { useAlert } from "../../core/alerts/AlertContext";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -64,6 +65,7 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 }));
 
 export default function SignIn(props: { disableCustomTheme?: boolean }) {
+  const { showAlert } = useAlert();
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
   const [passwordError, setPasswordError] = React.useState(false);
@@ -99,7 +101,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
       if (redirectUrl) {
         window.location.href = `${redirectUrl}?token=${user.data.token}`;
       } else {
-        navigate("Blog");
+        navigate("/blog");
         sessionStorage.setItem("accessToken", user.data.token);
       }
     } else {
