@@ -15,6 +15,7 @@ import ColorModeIconDropdown from "../../shared-theme/ColorModeIconDropdown";
 import Link from "@mui/material/Link";
 import { useAuth } from "../../../core/authcontext";
 import { useNavigate } from "react-router-dom";
+import { Typography } from "../../../../node_modules/@mui/material/index";
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   display: "flex",
@@ -97,6 +98,11 @@ export default function AppAppBar() {
               </Button>
             </Box>
           </Box>
+          <Box>
+            <Typography variant="text" color="info" size="small">
+              Hi! {localStorage.getItem("username")}
+            </Typography>
+          </Box>
           {isAuthenticated ? (
             <Box
               sx={{
@@ -170,14 +176,9 @@ export default function AppAppBar() {
                     color="primary"
                     variant="contained"
                     fullWidth
-                    onClick={signUpClicked}
+                    onClick={logoutClicked}
                   >
-                    Sign up
-                  </Button>
-                </MenuItem>
-                <MenuItem>
-                  <Button color="primary" variant="outlined" fullWidth>
-                    Sign in
+                    Logout
                   </Button>
                 </MenuItem>
               </Box>
