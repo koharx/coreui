@@ -17,10 +17,10 @@ import ForgotPassword from "./ForgotPassword";
 import { GoogleIcon, FacebookIcon, SitemarkIcon } from "./CustomIcons";
 import AppTheme from "../shared-theme/AppTheme";
 import ColorModeSelect from "../shared-theme/ColorModeSelect";
-import { login } from "../../service/userservice";
 import { useNavigate } from "react-router-dom";
 import CircularProgressBar from "../spinner/CircularSpinner";
-import { useAlert } from "../../core/alerts/AlertContext";
+import { useAuth } from "../../core/authcontext";
+import { userLogin } from "../../service/userService";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -65,7 +65,6 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 }));
 
 export default function SignIn(props: { disableCustomTheme?: boolean }) {
-  const { showAlert } = useAlert();
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
   const [passwordError, setPasswordError] = React.useState(false);
@@ -73,6 +72,9 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
   const [open, setOpen] = React.useState(false);
   const navigate = useNavigate();
   const [showLoader, setShowLoader] = React.useState(false);
+
+  const { login, isAuthenticated } = useAuth();
+
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -93,23 +95,27 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
       password: data.get("password"),
     };
     setShowLoader(true);
-    const user = await login(userData);
+    const user = await userLogin(userData);
     if (user.success) {
       setShowLoader(false);
       const queryParams = new URLSearchParams(window.location.search);
       const redirectUrl = queryParams.get("redirect_uri");
       if (redirectUrl) {
-        window.location.href = `${redirectUrl}?token=${user.data.token}`;
+        window.location.href = `${redirectUrl}?token=${user.data.accessToken}`;
       } else {
+        login(user.data.accessToken);
         navigate("/blog");
-        sessionStorage.setItem("accessToken", user.data.token);
       }
     } else {
       setShowLoader(false);
     }
   };
 
-  React.useEffect(() => {}, []);
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/blog");
+    }
+  }, [isAuthenticated, navigate]);
 
   const validateInputs = () => {
     const email = document.getElementById("email") as HTMLInputElement;
@@ -134,7 +140,6 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
       setPasswordError(false);
       setPasswordErrorMessage("");
     }
-
     return isValid;
   };
 
@@ -146,7 +151,6 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
           sx={{ position: "fixed", top: "1rem", right: "1rem" }}
         />
         <Card variant="outlined">
-          <SitemarkIcon />
           <Typography
             component="h1"
             variant="h4"
