@@ -1,5 +1,5 @@
-import apiClient from '../core/axios';
-import { showAlertFromJS } from '../core/alerts/AlertContext';
+import apiClient from "../core/axios";
+import { showAlertFromJS } from "../hooks/alerts/AlertContext";
 
 export const userLogin = async (data) => {
     let response = { success: false };
