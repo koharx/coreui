@@ -13,7 +13,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import ColorModeIconDropdown from "../../shared-theme/ColorModeIconDropdown";
 import Link from "@mui/material/Link";
-import { useAuth } from "../../../core/authcontext";
+import { useAuth } from "../../../hooks/authcontext";
 import { useNavigate } from "react-router-dom";
 import { Typography } from "../../../../node_modules/@mui/material/index";
 

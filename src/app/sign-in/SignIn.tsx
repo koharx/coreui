@@ -19,7 +19,7 @@ import AppTheme from "../shared-theme/AppTheme";
 import ColorModeSelect from "../shared-theme/ColorModeSelect";
 import { useNavigate } from "react-router-dom";
 import CircularProgressBar from "../spinner/CircularSpinner";
-import { useAuth } from "../../core/authcontext";
+import { useAuth } from "../../hooks/authcontext";
 import { userLogin } from "../../service/userService";
 
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -104,7 +104,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
         window.location.href = `${redirectUrl}?token=${user.data.accessToken}`;
       } else {
         login(user.data.accessToken);
-        navigate("/blog");
+        navigate("/dashboard");
       }
     } else {
       setShowLoader(false);
@@ -113,7 +113,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
 
   React.useEffect(() => {
     if (isAuthenticated) {
-      navigate("/blog");
+      navigate("/dashboard");
     }
   }, [isAuthenticated, navigate]);
 
@@ -151,7 +151,6 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
           sx={{ position: "fixed", top: "1rem", right: "1rem" }}
         />
         <Card variant="outlined">
-         
           <Typography
             component="h1"
             variant="h4"

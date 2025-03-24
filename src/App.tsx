@@ -1,10 +1,14 @@
 import React, { useContext } from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
 import SignIn from "./app/sign-in/SignIn";
 import SignUp from "./app/sign-up/SignUp";
-import Blog from "./app/blog/Blog";
-import { AuthProvider, useAuth } from "./core/authcontext";
-import { Navigate } from "../node_modules/react-router-dom/dist/index";
+import { AuthProvider, useAuth } from "./hooks/authcontext";
+import Dashboard from "./app/dashboard/Dashboard";
 
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
   const { isAuthenticated } = useAuth();
@@ -20,10 +24,10 @@ const App: React.FC = () => {
             <Route path="/" element={<SignIn />} />
             <Route path="/registration" element={<SignUp />} />
             <Route
-              path="/blog"
+              path="/dashboard"
               element={
                 <PrivateRoute>
-                  <Blog />
+                  <Dashboard />
                 </PrivateRoute>
               }
             />
