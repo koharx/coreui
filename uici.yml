@@ -2,7 +2,7 @@ trigger:
 - develop
 
 pool:
-  name: sso 
+  name: hkuniverseagent 
 
 stages:
 - stage: Build
