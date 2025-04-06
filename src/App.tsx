@@ -5,10 +5,10 @@ import {
   Routes,
   Navigate,
 } from "react-router-dom";
-import SignIn from "./app/sign-in/SignIn";
-import SignUp from "./app/sign-up/SignUp";
+import SignIn from "./component/sign-in/SignIn";
+import SignUp from "./component/sign-up/SignUp";
 import { AuthProvider, useAuth } from "./hooks/authcontext";
-import Dashboard from "./app/dashboard/Dashboard";
+import Dashboard from "./component/dashboard/Dashboard";
 
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
   const { isAuthenticated } = useAuth();

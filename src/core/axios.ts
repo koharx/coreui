@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+
 const apiClient = axios.create({
   baseURL: process.env.AUTHSERVICE_URL, 
   timeout: 10000,
