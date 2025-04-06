@@ -263,5 +263,3 @@ _Pvt_Extensions
 
 bin/
 obj/
-
-.env.*
