@@ -83,6 +83,11 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
     setOpen(false);
   };
 
+  const redictToCallback = () => {
+    const queryParams = new URLSearchParams(window.location.search);
+    return queryParams.get("redirect_uri");
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     if (emailError || passwordError) {
       event.preventDefault();
@@ -98,8 +103,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
     const user = await userLogin(userData);
     if (user.success) {
       setShowLoader(false);
-      const queryParams = new URLSearchParams(window.location.search);
-      const redirectUrl = queryParams.get("redirect_uri");
+      const redirectUrl = redictToCallback();
       if (redirectUrl) {
         window.location.href = `${redirectUrl}?token=${user.data.accessToken}`;
       } else {
