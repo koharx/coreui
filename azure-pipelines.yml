@@ -2,7 +2,13 @@ trigger:
 - develop
 
 pool:
-  name: hkuniverseagent  # Your self-hosted agent
+  name: hkuniverseagent
+
+variables:
+  AZURE_SUBSCRIPTION: AzureDevOpsConnection
+  RESOURCE_GROUP: ssoauthservice_group
+  APP_CONFIG_NAME: hkuniverseconfigs
+
 
 stages:
 - stage: Build
@@ -21,6 +27,22 @@ stages:
 
     - script: npm install
       displayName: 'Install Dependencies'
+
+    - task: AzureCLI@2
+      inputs:
+        azureSubscription: '$(AZURE_SUBSCRIPTION)'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          echo "Logging in to Azure..."
+          az appconfig kv list \
+            --name $(APP_CONFIG_NAME) \
+            --query "[?starts_with(key, 'REACT_APP_')].{key:key, value:value}" \
+            -o tsv | while IFS=$'\t' read -r key value
+          do
+            echo "$key=$value" >> .env.production
+          done
+      displayName: 'Fetch config from Azure App Configuration'
 
     - script: npm run build -- --output-path=build
       displayName: 'Build React App'
@@ -57,7 +79,7 @@ stages:
           - task: AzureWebApp@1
             displayName: 'Deploy to Azure Web App'
             inputs:
-              azureSubscription: 'AzureDevOpsConnection'
+              azureSubscription: '$(AZURE_SUBSCRIPTION)'
               appName: 'ssoui'
               package: '$(Pipeline.Workspace)/drop'
               runtimeStack: 'NODE|18-lts'
@@ -65,7 +87,7 @@ stages:
           - task: AzureCLI@2
             displayName: "Set WEBSITE_RUN_FROM_PACKAGE to 0"
             inputs:
-              azureSubscription: "AzureDevOpsConnection"
+              azureSubscription: "$(AZURE_SUBSCRIPTION)"
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
