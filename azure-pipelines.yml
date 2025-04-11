@@ -40,9 +40,8 @@ stages:
             --query "[?starts_with(key, 'REACT_APP_')].{key:key, value:value}" \
             -o tsv | while IFS=$'\t' read -r key value
           do
-            echo "$key=$value" >> .env.production
-            echo "$key"
-            cat .env.production
+            echo "$key=$value" >> .env.development
+            cat .env.development
           done
       displayName: 'Fetch config from Azure App Configuration'
 
