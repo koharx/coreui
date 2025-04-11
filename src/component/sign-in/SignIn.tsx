@@ -83,9 +83,11 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
     setOpen(false);
   };
 
-  const redictToCallback = () => {
+  const redictToCallback = (accessToken) => {
     const queryParams = new URLSearchParams(window.location.search);
-    return queryParams.get("redirect_uri");
+    const redirectUrl = queryParams.get("redirect_uri");
+    if (redirectUrl)
+      window.location.href = `${redirectUrl}?token=${accessToken}`;
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -103,13 +105,9 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
     const user = await userLogin(userData);
     if (user.success) {
       setShowLoader(false);
-      const redirectUrl = redictToCallback();
-      if (redirectUrl) {
-        window.location.href = `${redirectUrl}?token=${user.data.accessToken}`;
-      } else {
-        login(user.data.accessToken);
-        navigate("/dashboard");
-      }
+      redictToCallback(user.data.accessToken);
+      login(user.data.accessToken);
+      navigate("/dashboard");
     } else {
       setShowLoader(false);
     }
@@ -117,6 +115,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
 
   React.useEffect(() => {
     if (isAuthenticated) {
+      redictToCallback(localStorage.getItem("accessToken"));
       navigate("/dashboard");
     }
   }, [isAuthenticated, navigate]);
