@@ -42,6 +42,7 @@ stages:
           do
             echo "$key=$value" >> .env.production
             echo "$key"
+            cat .env.production
           done
       displayName: 'Fetch config from Azure App Configuration'
 
