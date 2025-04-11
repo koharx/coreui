@@ -41,7 +41,7 @@ stages:
             -o tsv | while IFS=$'\t' read -r key value
           do
             echo "$key=$value" >> .env
-            echo "$value"
+            echo "$key"
           done
       displayName: 'Fetch config from Azure App Configuration'
 
