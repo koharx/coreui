@@ -5,6 +5,7 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
+import getUsernameFromToken from "../core/token";
 
 type AuthContextType = {
   isAuthenticated: boolean;

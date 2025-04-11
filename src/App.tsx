@@ -11,14 +11,8 @@ import { AuthProvider, useAuth } from "./hooks/authcontext";
 import Dashboard from "./component/dashboard/Dashboard";
 
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
-  const queryParams = new URLSearchParams(window.location.search);
-  const redirectUrl = queryParams.get("redirect_uri");
-  if (redirectUrl) {
-    window.location.href = `${redirectUrl}?token=${user.data.accessToken}`;
-  } else {
-    const { isAuthenticated } = useAuth();
-    return isAuthenticated ? children : <Navigate to="/" />;
-  }
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? children : <Navigate to="/" />;
 };
 
 const App: React.FC = () => {
