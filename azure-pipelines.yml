@@ -37,6 +37,7 @@ stages:
           echo "Logging in to Azure..."
           az appconfig kv list \
             --name $(APP_CONFIG_NAME) \
+            --label ssoui_development \
             --query "[?starts_with(key, 'REACT_APP_')].{key:key, value:value}" \
             -o tsv | while IFS=$'\t' read -r key value
           do
