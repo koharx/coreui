@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-export function useKeyPress(targetKey: string): boolean {
+export const useKeyPress = (targetKey: string) => {
   const [keyPressed, setKeyPressed] = useState(false);
 
   useEffect(() => {
@@ -26,4 +26,4 @@ export function useKeyPress(targetKey: string): boolean {
   }, [targetKey]);
 
   return keyPressed;
-} 
+}; 

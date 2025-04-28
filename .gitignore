@@ -265,3 +265,5 @@ bin/
 obj/
 
 .env.*
+
+*storybook.log

@@ -3,9 +3,11 @@ import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import typescript from '@rollup/plugin-typescript';
 import postcss from 'rollup-plugin-postcss';
-import { terser } from 'rollup-plugin-terser';
+import terser from '@rollup/plugin-terser';
+import json from '@rollup/plugin-json';
+import { readFileSync } from 'fs';
 
-const packageJson = require('./package.json');
+const packageJson = JSON.parse(readFileSync('./package.json', 'utf8'));
 
 export default {
   input: 'src/index.ts',
@@ -25,6 +27,7 @@ export default {
     peerDepsExternal(),
     resolve(),
     commonjs(),
+    json(),
     typescript({ tsconfig: './tsconfig.json' }),
     postcss({
       extensions: ['.css'],
@@ -32,5 +35,20 @@ export default {
     }),
     terser(),
   ],
-  external: ['react', 'react-dom', 'react-router-dom'],
+  external: [
+    'react',
+    'react-dom',
+    'react-router-dom',
+    '@mui/material',
+    '@mui/icons-material',
+    '@emotion/react',
+    '@emotion/styled',
+    'i18next',
+    'react-i18next',
+    'i18next-browser-languagedetector',
+    'winston',
+    'zustand',
+    'axios',
+    'jwt-decode'
+  ],
 }; 

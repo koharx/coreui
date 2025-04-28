@@ -1,7 +1,8 @@
-import { createTheme, ThemeOptions, TypographyOptions, TextTransform } from '@mui/material/styles';
+import { createTheme, ThemeOptions } from '@mui/material/styles';
+import { Theme, PaletteOptions, Components } from '@mui/material/styles';
 
-export interface CustomThemeOptions extends Omit<ThemeOptions, 'typography'> {
-  palette: {
+export interface CustomThemeOptions extends ThemeOptions {
+  palette: PaletteOptions & {
     primary: {
       main: string;
       light: string;
@@ -49,20 +50,7 @@ export interface CustomThemeOptions extends Omit<ThemeOptions, 'typography'> {
     };
     mode: 'light' | 'dark';
   };
-  typography: TypographyOptions & {
-    button: {
-      fontSize: string;
-      fontWeight: number;
-      textTransform: TextTransform;
-    };
-  };
-  spacing: number;
-  shape: {
-    borderRadius: number;
-  };
-  components?: {
-    [key: string]: any;
-  };
+  components?: Components<Omit<Theme, 'components'>>;
 }
 
 export const lightTheme: CustomThemeOptions = {
@@ -159,7 +147,7 @@ export const lightTheme: CustomThemeOptions = {
     button: {
       fontSize: '0.875rem',
       fontWeight: 500,
-      textTransform: 'none' as TextTransform,
+      textTransform: 'none',
     },
   },
   spacing: 8,
@@ -190,5 +178,5 @@ export const createCustomTheme = (options: Partial<CustomThemeOptions> = {}) => 
   return createTheme({
     ...baseTheme,
     ...options,
-  } as ThemeOptions);
+  });
 }; 
