@@ -1,51 +1,78 @@
 {
-  "name": "ssoui",
+  "name": "@khuniverse/sso-coreui",
   "version": "1.0.0",
-  "main": "index.js",
-  "license": "MIT",
+  "description": "A comprehensive React UI library with authentication, form handling, and API integration",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "start": "webpack serve --mode development",
-    "build": "webpack --mode production"
+    "build": "rollup -c",
+    "build:types": "tsc --emitDeclarationOnly",
+    "test": "jest",
+    "lint": "eslint src --ext .ts,.tsx",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run lint && npm run test"
+  },
+  "peerDependencies": {
+    "react": "^16.8.0 || ^17.0.0 || ^18.0.0",
+    "react-dom": "^16.8.0 || ^17.0.0 || ^18.0.0"
   },
   "dependencies": {
     "@emotion/react": "^11.13.5",
     "@emotion/styled": "^11.13.5",
-    "@heroicons/react": "^2.1.5",
-    "@mui/icons-material": "^6.1.8",
     "@mui/material": "^6.1.8",
-    "@mui/x-charts": "^7.28.0",
-    "@mui/x-data-grid": "^7.28.0",
-    "@mui/x-date-pickers": "^7.28.0",
-    "@mui/x-tree-view": "^7.28.0",
-    "@types/react-router-dom": "^5.3.3",
-    "autoprefixer": "^10.4.20",
-    "dayjs": "^1.11.13",
-    "html-webpack-plugin": "^5.6.0",
+    "axios": "^1.6.7",
     "jwt-decode": "^4.0.0",
-    "postcss-cli": "^11.0.0",
     "react": "^18.3.1",
-    "react-axios": "^2.0.6",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.2",
-    "tailwindcss": "^3.4.15"
+    "react-toastify": "^10.0.4",
+    "winston": "^3.11.0",
+    "zustand": "^4.5.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@babel/preset-env": "^7.25.4",
     "@babel/preset-react": "^7.26.3",
     "@babel/preset-typescript": "^7.26.0",
+    "@rollup/plugin-commonjs": "^25.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.0",
+    "@rollup/plugin-typescript": "^11.0.0",
+    "@testing-library/react": "^14.0.0",
     "@types/react": "^18.3.7",
     "@types/react-dom": "^18.3.0",
-    "babel-loader": "^9.2.1",
-    "css-loader": "^7.1.2",
-    "dotenv-webpack": "^8.1.0",
-    "postcss-loader": "^8.1.1",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "eslint-plugin-react": "^7.0.0",
+    "eslint-plugin-react-hooks": "^4.0.0",
+    "jest": "^29.0.0",
     "prettier": "^3.3.3",
-    "prettier-plugin-tailwindcss": "^0.6.6",
-    "style-loader": "^4.0.0",
-    "typescript": "^5.6.2",
-    "webpack": "^5.94.0",
-    "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^5.1.0"
-  }
+    "rollup": "^3.0.0",
+    "ts-jest": "^29.0.0",
+    "typescript": "^5.6.2"
+  },
+  "keywords": [
+    "react",
+    "ui",
+    "components",
+    "authentication",
+    "forms",
+    "hooks",
+    "typescript"
+  ],
+  "author": "KH Universe",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/khuniverse/sso-coreui.git"
+  },
+  "bugs": {
+    "url": "https://github.com/khuniverse/sso-coreui/issues"
+  },
+  "homepage": "https://github.com/khuniverse/sso-coreui#readme"
 }
