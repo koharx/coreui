@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth as useAuthContext } from '../contexts/AuthContext';
 import { useAlert } from '../contexts/AlertContext';
 import axiosInstance from '../utils/axios';
@@ -10,7 +10,8 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  role: string;
+  roles: string[];
+  permissions?: string[];
 }
 
 export interface LoginCredentials {
@@ -53,16 +54,16 @@ export const useAuth = () => {
   }, [clearRefreshTimeout]);
 
   const login = useCallback(async (credentials: LoginCredentials) => {
-    setState(prev => ({ ...prev, isLoading: true, error: null }));
+    setState((prev: AuthState) => ({ ...prev, isLoading: true, error: null }));
     
     try {
       const response = await axiosInstance.post<{ token: string; expiresIn: number }>('/auth/login', credentials);
       const { token, expiresIn } = response.data;
       
-      contextLogin(token);
+      contextLogin(token, expiresIn.toString());
       scheduleTokenRefresh(expiresIn);
       
-      setState(prev => ({
+      setState((prev: AuthState) => ({
         ...prev,
         isLoading: false,
         isAuthenticated: true,
@@ -72,10 +73,10 @@ export const useAuth = () => {
       logInfo('User logged in', { email: credentials.email });
     } catch (error) {
       const err = error as Error;
-      logError(err, 'Login Error', { email: credentials.email });
+      logError(err, 'Login Error');
       showError('Login failed. Please check your credentials.');
       
-      setState(prev => ({
+      setState((prev: AuthState) => ({
         ...prev,
         isLoading: false,
         error: err,
@@ -90,7 +91,7 @@ export const useAuth = () => {
       clearRefreshTimeout();
       contextLogout();
       
-      setState(prev => ({
+      setState((prev: AuthState) => ({
         ...prev,
         isAuthenticated: false,
         user: null,
@@ -103,7 +104,7 @@ export const useAuth = () => {
       logError(err, 'Logout Error');
       showError('Logout failed');
       
-      setState(prev => ({
+      setState((prev: AuthState) => ({
         ...prev,
         error: err,
       }));
@@ -117,7 +118,7 @@ export const useAuth = () => {
       const response = await axiosInstance.post<{ token: string; expiresIn: number }>('/auth/refresh');
       const { token, expiresIn } = response.data;
       
-      contextLogin(token);
+      contextLogin(token, expiresIn.toString());
       scheduleTokenRefresh(expiresIn);
       
       logInfo('Token refreshed successfully');
@@ -130,11 +131,11 @@ export const useAuth = () => {
   }, [contextLogin, contextLogout, scheduleTokenRefresh]);
 
   const hasRole = useCallback((role: string) => {
-    return user?.role === role;
+    return user?.roles?.includes(role) || false;
   }, [user]);
 
   const hasAnyRole = useCallback((roles: string[]) => {
-    return roles.includes(user?.role || '');
+    return roles.some(role => user?.roles?.includes(role)) || false;
   }, [user]);
 
   const hasPermission = useCallback((permission: string) => {

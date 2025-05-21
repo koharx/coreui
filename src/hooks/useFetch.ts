@@ -53,13 +53,23 @@ export const useFetch = <T>(): UseFetchReturn<T> => {
     lastOptionsRef.current = options;
     
     try {
+      let headers: { [key: string]: string } = { 'Content-Type': 'application/json' };
+      if (options.headers) {
+        if (options.headers instanceof Headers) {
+          options.headers.forEach((value, key) => {
+            headers[key] = value;
+          });
+        } else if (typeof options.headers === 'object' && !Array.isArray(options.headers)) {
+          headers = { ...headers, ...options.headers };
+        }
+      }
+      const { body, cache: fetchCache, credentials, integrity, keepalive, method, mode, redirect, referrer, referrerPolicy, signal, ...axiosOptions } = options;
       const response = await axiosInstance({
         url,
-        ...options,
-        headers: {
-          'Content-Type': 'application/json',
-          ...options.headers,
-        },
+        ...axiosOptions,
+        headers,
+        data: body,
+        method,
       });
       
       const data = response.data as T;
@@ -75,7 +85,7 @@ export const useFetch = <T>(): UseFetchReturn<T> => {
       });
     } catch (error) {
       const err = error as Error;
-      logError(err, 'Fetch Error', { url, options });
+      logError(err, 'Fetch Error');
       showError(err.message || 'An error occurred while fetching data');
       setState({
         data: null,

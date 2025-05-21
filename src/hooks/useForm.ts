@@ -33,7 +33,7 @@ interface UseFormReturn<T> extends FormState<T> {
 
 export const useForm = <T extends Record<string, any>>(
   initialValues: T,
-  validationRules: ValidationRules<T> = {}
+  validationRules: ValidationRules = {}
 ): UseFormReturn<T> => {
   const [state, setState] = useState<FormState<T>>({
     values: initialValues,
@@ -47,7 +47,7 @@ export const useForm = <T extends Record<string, any>>(
     value: T[keyof T],
     values: T
   ): Promise<string | null> => {
-    const rules = validationRules[name];
+    const rules = validationRules[name as string];
     if (!rules) return null;
 
     if (rules.required && !value) {

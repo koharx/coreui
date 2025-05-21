@@ -3,7 +3,8 @@ import type { StorybookConfig } from '@storybook/react-webpack5';
 const config: StorybookConfig = {
   "stories": [
     "../src/**/*.mdx",
-    "../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"
+    "../src/**/*.stories.@(js|jsx|mjs|ts|tsx)",
+    "../src/components/**/*.stories.@(js|jsx|mjs|ts|tsx)"  // Add this line
   ],
   "addons": [
     "@storybook/addon-webpack5-compiler-swc",
