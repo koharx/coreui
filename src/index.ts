@@ -16,9 +16,9 @@ export { useIntersectionObserver } from './hooks/useIntersectionObserver';
 export { useKeyPress } from './hooks/useKeyPress';
 
 // Components
-export { Modal } from './components/Modal/Modal';
-export { DataTable } from './components/DataTable/DataTable';
-export { Form } from './components/Form/Form';
+// export { Modal } from './components/Modal/Modal';
+// export { DataTable } from './components/DataTable/DataTable';
+// export { Form } from './components/Form/Form';
 
 // Types
 export type { User } from './hooks/useAuth';

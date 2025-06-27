@@ -20,28 +20,23 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
-  "peerDependencies": {
-    "@mui/icons-material": "^5.0.0",
-    "@mui/material": "^5.0.0",
-    "react": "^16.8.0 || ^17.0.0 || ^18.0.0",
-    "react-dom": "^16.8.0 || ^17.0.0 || ^18.0.0"
-  },
   "dependencies": {
-    "@emotion/react": "^11.11.0",
-    "@emotion/styled": "^11.11.0",
-    "@mui/icons-material": "^5.0.0",
-    "@mui/material": "^5.0.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.1.2",
+    "@mui/material": "^7.1.2",
     "axios": "^1.6.7",
     "i18next": "^23.0.0",
     "i18next-browser-languagedetector": "^7.0.0",
     "jwt-decode": "^4.0.0",
-    "react": "^16.8.0 || ^17.0.0 || ^18.0.0",
-    "react-dom": "^16.8.0 || ^17.0.0 || ^18.0.0",
     "react-i18next": "^13.0.0",
     "react-router-dom": "^6.26.2",
     "react-toastify": "^11.0.5",
-    "winston": "^3.11.0",
     "zustand": "^4.5.0"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
