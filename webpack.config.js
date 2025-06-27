@@ -1,44 +1,66 @@
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = {
-    entry: './src/index.tsx',
-    output: {
-        path: path.resolve(__dirname, 'dist'), // Output directory for builds
-        filename: 'bundle.js',
-        publicPath: '/', // Important for DevServer to know where to serve the bundle
+  entry: './src/index.tsx',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'bundle.js',
+  },
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js', '.jsx'],
+    fallback: {
+      "os": require.resolve("os-browserify/browser"),
+      "path": require.resolve("path-browserify"),
+      "zlib": require.resolve("browserify-zlib"),
+      "http": require.resolve("stream-http"),
+      "https": require.resolve("https-browserify"),
+      "fs": false,
+      "crypto": false,
+      "stream": false,
+      "buffer": false,
+      "util": false,
+      "assert": false,
+      "url": false,
+      "process": false,
+      "constants": false,
+      "events": false,
+      "string_decoder": false,
+      "querystring": false,
+      "punycode": false,
+      "domain": false,
+      "timers": false,
+      "console": false,
+      "vm": false,
+      "tty": false,
+      "net": false,
+      "dns": false,
+      "dgram": false,
+      "child_process": false
     },
-    resolve: {
-        extensions: ['.ts', '.tsx', '.js'], // File types to resolve
-    },
-    module: {
-        rules: [
-            {
-                test: /\.(ts|tsx)$/,
-                use: 'babel-loader',
-                exclude: /node_modules/,
-            },
-            {
-                test: /\.css$/,
-                use: ['style-loader', 'css-loader', 'postcss-loader'],
-            },
-        ],
-    },
-    plugins: [
-        new HtmlWebpackPlugin({
-            template: './public/index.html', // HTML template to inject the bundle
-        }),
+    alias: {
+      '@mui/material': path.resolve(__dirname, 'node_modules/@mui/material'),
+      '@mui/icons-material': path.resolve(__dirname, 'node_modules/@mui/icons-material'),
+      '@emotion/react': path.resolve(__dirname, 'node_modules/@emotion/react'),
+      '@emotion/styled': path.resolve(__dirname, 'node_modules/@emotion/styled')
+    }
+  },
+  module: {
+    rules: [
+      {
+        test: /\.(ts|tsx)$/,
+        exclude: /node_modules/,
+        use: 'ts-loader',
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader'],
+      },
     ],
-    devServer: {
-        static: {
-            directory: path.resolve(__dirname, 'public'), // Serve index.html from public folder
-        },
-        devMiddleware: {
-            publicPath: '/', // Serve the bundle from memory, not file system
-        },
-        port: 3000,
-        hot: true,
-        historyApiFallback: true, // Ensures all routes go to index.html (useful for SPA)
-    },
-    mode: 'development',
-};
+  },
+  plugins: [
+    new webpack.ProvidePlugin({
+      process: 'process/browser',
+    }),
+  ],
+}; 

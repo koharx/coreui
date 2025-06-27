@@ -263,3 +263,7 @@ _Pvt_Extensions
 
 bin/
 obj/
+
+.env.*
+
+*storybook.log
