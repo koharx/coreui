@@ -1,196 +1,167 @@
-# @khuniverse/sso-coreui
+# @khuniverse/core-ui
 
-A comprehensive React UI library with authentication, form handling, and API integration.
+A comprehensive React library providing authentication, API calling, logging, and alert functionality with TypeScript support.
 
 ## Features
 
-- 🔐 Authentication with JWT
-- 📝 Form handling with validation
-- 🔄 API integration with caching
-- 🚀 TypeScript support
-- 📱 Responsive design
-- 🎨 Material UI components
-- 📊 Data visualization
-- 📅 Date and time pickers
-- 📋 Data grids
-- 🌳 Tree views
+- 🔐 **Authentication**: JWT-based authentication with role and permission management
+- 🌐 **API Client**: Axios-based HTTP client with interceptors and error handling
+- 📝 **Logging**: Configurable logging system with console and localStorage support
+- 🚨 **Alerts**: Toast notifications with multiple types and positioning
+- 🎣 **Utility Hooks**: LocalStorage, SessionStorage, Debounce, and Throttle hooks
+- 📦 **TypeScript**: Full TypeScript support with comprehensive type definitions
 
 ## Installation
 
 ```bash
-npm install @khuniverse/sso-coreui
-# or
-yarn add @khuniverse/sso-coreui
+npm install @khuniverse/core-ui
 ```
 
-## Usage
+## Quick Start
 
-### Authentication
-
-```typescript
-import { useAuth, AlertProvider } from '@khuniverse/sso-coreui';
+```tsx
+import React from 'react';
+import { 
+  AuthProvider, 
+  ApiProvider, 
+  LoggerProvider,
+  AlertProvider,
+  AlertContainer,
+  useAuth,
+  useApi,
+  useLogger,
+  useAlert
+} from '@khuniverse/core-ui';
 
 function App() {
   return (
-    <AlertProvider>
-      <YourApp />
-    </AlertProvider>
+    <LoggerProvider config={{ level: 'info', enableConsole: true }}>
+      <AlertProvider maxAlerts={5} defaultDuration={5000}>
+        <ApiProvider config={{ baseURL: 'https://api.example.com' }}>
+          <AuthProvider>
+            <MyApp />
+            <AlertContainer position="top-right" />
+          </AuthProvider>
+        </ApiProvider>
+      </AlertProvider>
+    </LoggerProvider>
   );
 }
 
-function LoginForm() {
-  const { login, isAuthenticated } = useAuth();
-  const { showError } = useAlert();
+function MyApp() {
+  const { login, user, isAuthenticated } = useAuth();
+  const { get, post } = useApi();
+  const { info, error } = useLogger();
+  const { showSuccess, showError } = useAlert();
 
-  const handleLogin = async (credentials) => {
+  const handleLogin = async () => {
     try {
-      await login(credentials);
-    } catch (error) {
-      showError('Login failed');
+      await login({ email: 'user@example.com', password: 'password' });
+      info('User logged in successfully');
+      showSuccess('Login Successful', 'Welcome back!');
+    } catch (err) {
+      error('Login failed', err as Error);
+      showError('Login Failed', 'Invalid credentials');
     }
   };
 
   return (
-    // Your login form
+    <div>
+      {isAuthenticated ? (
+        <p>Welcome, {user?.name}!</p>
+      ) : (
+        <button onClick={handleLogin}>Login</button>
+      )}
+    </div>
   );
 }
 ```
 
-### Form Handling
+## Alert System
 
-```typescript
-import { useForm } from '@khuniverse/sso-coreui';
+### AlertProvider
 
-function UserForm() {
-  const { values, errors, handleChange, validateForm } = useForm({
-    name: '',
-    email: '',
-  }, {
-    name: {
-      required: true,
-      minLength: 3,
-    },
-    email: {
-      required: true,
-      pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-    },
-  });
+Provides alert context for displaying toast notifications.
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (await validateForm()) {
-      // Submit form
-    }
+```tsx
+import { AlertProvider } from '@khuniverse/core-ui';
+
+<AlertProvider maxAlerts={5} defaultDuration={5000}>
+  <YourApp />
+</AlertProvider>
+```
+
+### useAlert Hook
+
+```tsx
+import { useAlert } from '@khuniverse/core-ui';
+
+function MyComponent() {
+  const { 
+    showAlert, 
+    showSuccess, 
+    showError, 
+    showWarning, 
+    showInfo,
+    dismissAlert,
+    clearAlerts 
+  } = useAlert();
+
+  const handleSuccess = () => {
+    showSuccess('Success!', 'Operation completed successfully');
+  };
+
+  const handleError = () => {
+    showError('Error!', 'Something went wrong');
+  };
+
+  const handleWarning = () => {
+    showWarning('Warning!', 'Please check your input');
+  };
+
+  const handleInfo = () => {
+    showInfo('Info', 'Here is some information');
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        name="name"
-        value={values.name}
-        onChange={handleChange}
-      />
-      {errors.name && <div>{errors.name}</div>}
-
-      <input
-        name="email"
-        value={values.email}
-        onChange={handleChange}
-      />
-      {errors.email && <div>{errors.email}</div>}
-
-      <button type="submit">Submit</button>
-    </form>
+    <div>
+      <button onClick={handleSuccess}>Show Success</button>
+      <button onClick={handleError}>Show Error</button>
+      <button onClick={handleWarning}>Show Warning</button>
+      <button onClick={handleInfo}>Show Info</button>
+      <button onClick={clearAlerts}>Clear All</button>
+    </div>
   );
 }
 ```
 
-### API Integration
+### AlertContainer
 
-```typescript
-import { useFetch } from '@khuniverse/sso-coreui';
+Displays the alerts in the UI. You can position it anywhere in your app.
 
-function UserList() {
-  const { data, loading, error, fetchData } = useFetch<User[]>();
+```tsx
+import { AlertContainer } from '@khuniverse/core-ui';
 
-  useEffect(() => {
-    fetchData('/users', { cacheTime: 300000 }); // Cache for 5 minutes
-  }, [fetchData]);
-
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
-
-  return (
-    <ul>
-      {data?.map(user => (
-        <li key={user.id}>{user.name}</li>
-      ))}
-    </ul>
-  );
-}
+// Position options: 'top-right', 'top-left', 'bottom-right', 'bottom-left', 'top-center', 'bottom-center'
+<AlertContainer position="top-right" />
 ```
 
-## API Reference
+### Alert Types
 
-### Hooks
+- **Success**: Green alerts for successful operations
+- **Error**: Red alerts for errors and failures
+- **Warning**: Yellow alerts for warnings
+- **Info**: Blue alerts for informational messages
 
-#### useAuth
+### Alert Options
 
-```typescript
-const {
-  user,
-  isAuthenticated,
-  login,
-  logout,
-  refreshToken,
-  hasRole,
-  hasAnyRole,
-  hasPermission,
-  hasAnyPermission,
-} = useAuth();
+```tsx
+showSuccess('Title', 'Message', {
+  duration: 3000, // Auto-dismiss after 3 seconds (0 = no auto-dismiss)
+  dismissible: true, // Whether the alert can be manually dismissed
+});
 ```
-
-#### useForm
-
-```typescript
-const {
-  values,
-  errors,
-  touched,
-  handleChange,
-  handleBlur,
-  setFieldValue,
-  setFieldError,
-  resetForm,
-  validateForm,
-  setValues,
-  setErrors,
-  setTouched,
-} = useForm(initialValues, validationRules);
-```
-
-#### useFetch
-
-```typescript
-const { data, loading, error, fetchData, reset, refetch } = useFetch<T>();
-```
-
-### Contexts
-
-#### AlertProvider
-
-```typescript
-const { showSuccess, showError, showWarning, showInfo } = useAlert();
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
 
 ## License
 
-MIT © [KH Universe](https://github.com/khuniverse)
+MIT 

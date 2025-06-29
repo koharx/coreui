@@ -1,25 +1,22 @@
 import { useState, useEffect, useRef } from 'react';
 
-export function useThrottle<T>(value: T, interval: number): T {
+export function useThrottle<T>(value: T, delay: number): T {
   const [throttledValue, setThrottledValue] = useState<T>(value);
   const lastExecuted = useRef<number>(Date.now());
 
   useEffect(() => {
-    const now = Date.now();
-    const timeSinceLastExecution = now - lastExecuted.current;
-
-    if (timeSinceLastExecution >= interval) {
-      setThrottledValue(value);
-      lastExecuted.current = now;
-    } else {
-      const timerId = setTimeout(() => {
+    const handler = setTimeout(() => {
+      const now = Date.now();
+      if (now - lastExecuted.current >= delay) {
         setThrottledValue(value);
-        lastExecuted.current = Date.now();
-      }, interval - timeSinceLastExecution);
+        lastExecuted.current = now;
+      }
+    }, delay - (Date.now() - lastExecuted.current));
 
-      return () => clearTimeout(timerId);
-    }
-  }, [value, interval]);
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
 
   return throttledValue;
 } 
