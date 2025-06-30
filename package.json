@@ -19,7 +19,13 @@
     "prepublishOnly": "npm run lint && npm run test"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.2.0",
+    "@mui/material": "^7.2.0",
+    "@mui/x-date-pickers": "^8.6.0",
     "axios": "^1.6.7",
+    "dayjs": "^1.11.13",
     "jwt-decode": "^4.0.0"
   },
   "peerDependencies": {
