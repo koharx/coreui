@@ -1,4 +1,4 @@
-# @khuniverse/core-ui
+# @koharx/core-ui
 
 A comprehensive React library providing authentication, API calling, logging, and alert functionality with TypeScript support.
 
@@ -14,7 +14,7 @@ A comprehensive React library providing authentication, API calling, logging, an
 ## Installation
 
 ```bash
-npm install @khuniverse/core-ui
+npm install @koharx/core-ui
 ```
 
 ## Quick Start
@@ -31,7 +31,7 @@ import {
   useApi,
   useLogger,
   useAlert
-} from '@khuniverse/core-ui';
+} from '@koharx/core-ui';
 
 function App() {
   return (
@@ -84,7 +84,7 @@ function MyApp() {
 Provides alert context for displaying toast notifications.
 
 ```tsx
-import { AlertProvider } from '@khuniverse/core-ui';
+import { AlertProvider } from '@koharx/core-ui';
 
 <AlertProvider maxAlerts={5} defaultDuration={5000}>
   <YourApp />
@@ -94,7 +94,7 @@ import { AlertProvider } from '@khuniverse/core-ui';
 ### useAlert Hook
 
 ```tsx
-import { useAlert } from '@khuniverse/core-ui';
+import { useAlert } from '@koharx/core-ui';
 
 function MyComponent() {
   const { 
@@ -140,7 +140,7 @@ function MyComponent() {
 Displays the alerts in the UI. You can position it anywhere in your app.
 
 ```tsx
-import { AlertContainer } from '@khuniverse/core-ui';
+import { AlertContainer } from '@koharx/core-ui';
 
 // Position options: 'top-right', 'top-left', 'bottom-right', 'bottom-left', 'top-center', 'bottom-center'
 <AlertContainer position="top-right" />
