@@ -162,11 +162,17 @@ showSuccess("Title", "Message", {
 });
 ```
 
-## Versioning
+## CI/CD & Versioning
 
-This project follows [Semantic Versioning](https://semver.org/). For detailed information about versioning and release management, see [VERSIONING.md](./VERSIONING.md).
+This project uses GitHub Actions for automated CI/CD, versioning, and publishing. For detailed setup instructions, see [GITHUB_ACTIONS.md](./GITHUB_ACTIONS.md).
 
-### Quick Version Commands
+### Automated Workflows
+
+- **CI**: Runs tests, linting, and builds on every push/PR
+- **Release**: Automatically versions and releases based on conventional commits
+- **Publish**: Publishes to npm and creates GitHub releases
+
+### Manual Version Commands
 
 ```bash
 # Patch release (bug fixes)
@@ -180,6 +186,16 @@ npm run release:major
 
 # Beta release (for testing)
 npm run release:beta
+```
+
+### Conventional Commits
+
+Use these commit formats for automatic versioning:
+
+```bash
+git commit -m "feat: add new component"     # Minor version
+git commit -m "fix: resolve bug"            # Patch version
+git commit -m "feat!: breaking change"      # Major version
 ```
 
 ## License
