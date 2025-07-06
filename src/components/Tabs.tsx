@@ -13,7 +13,7 @@ interface TabsProps {
 const Tabs: React.FC<TabsProps> = ({ labels, value, onChange, children }) => (
   <Box>
     <MuiTabs value={value} onChange={onChange}>
-      {labels.map((label, idx) => (
+      {labels.map((label) => (
         <MuiTab key={label} label={label} />
       ))}
     </MuiTabs>

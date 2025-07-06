@@ -1,6 +1,6 @@
 import React from "react";
 import { TimePicker as MuiTimePicker } from "@mui/x-date-pickers/TimePicker";
-import TextField, { TextFieldProps } from "@mui/material/TextField";
+import { TextFieldProps } from "@mui/material/TextField";
 
 interface TimePickerProps {
   label?: string;

@@ -4,7 +4,6 @@ import {
   useState,
   useCallback,
   useEffect,
-  type ReactNode,
   type FC,
 } from "react";
 import type { Alert, AlertContextType, AlertProviderProps } from "./types";

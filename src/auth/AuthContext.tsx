@@ -8,12 +8,7 @@ import {
   type FC,
 } from "react";
 import { jwtDecode } from "jwt-decode";
-import type {
-  User,
-  AuthState,
-  LoginCredentials,
-  AuthContextType,
-} from "./types";
+import type { AuthState, LoginCredentials, AuthContextType } from "./types";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
