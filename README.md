@@ -20,24 +20,24 @@ npm install @koharx/core-ui
 ## Quick Start
 
 ```tsx
-import React from 'react';
-import { 
-  AuthProvider, 
-  ApiProvider, 
+import React from "react";
+import {
+  AuthProvider,
+  ApiProvider,
   LoggerProvider,
   AlertProvider,
   AlertContainer,
   useAuth,
   useApi,
   useLogger,
-  useAlert
-} from '@koharx/core-ui';
+  useAlert,
+} from "@koharx/core-ui";
 
 function App() {
   return (
-    <LoggerProvider config={{ level: 'info', enableConsole: true }}>
+    <LoggerProvider config={{ level: "info", enableConsole: true }}>
       <AlertProvider maxAlerts={5} defaultDuration={5000}>
-        <ApiProvider config={{ baseURL: 'https://api.example.com' }}>
+        <ApiProvider config={{ baseURL: "https://api.example.com" }}>
           <AuthProvider>
             <MyApp />
             <AlertContainer position="top-right" />
@@ -56,12 +56,12 @@ function MyApp() {
 
   const handleLogin = async () => {
     try {
-      await login({ email: 'user@example.com', password: 'password' });
-      info('User logged in successfully');
-      showSuccess('Login Successful', 'Welcome back!');
+      await login({ email: "user@example.com", password: "password" });
+      info("User logged in successfully");
+      showSuccess("Login Successful", "Welcome back!");
     } catch (err) {
-      error('Login failed', err as Error);
-      showError('Login Failed', 'Invalid credentials');
+      error("Login failed", err as Error);
+      showError("Login Failed", "Invalid credentials");
     }
   };
 
@@ -84,43 +84,43 @@ function MyApp() {
 Provides alert context for displaying toast notifications.
 
 ```tsx
-import { AlertProvider } from '@koharx/core-ui';
+import { AlertProvider } from "@koharx/core-ui";
 
 <AlertProvider maxAlerts={5} defaultDuration={5000}>
   <YourApp />
-</AlertProvider>
+</AlertProvider>;
 ```
 
 ### useAlert Hook
 
 ```tsx
-import { useAlert } from '@koharx/core-ui';
+import { useAlert } from "@koharx/core-ui";
 
 function MyComponent() {
-  const { 
-    showAlert, 
-    showSuccess, 
-    showError, 
-    showWarning, 
+  const {
+    showAlert,
+    showSuccess,
+    showError,
+    showWarning,
     showInfo,
     dismissAlert,
-    clearAlerts 
+    clearAlerts,
   } = useAlert();
 
   const handleSuccess = () => {
-    showSuccess('Success!', 'Operation completed successfully');
+    showSuccess("Success!", "Operation completed successfully");
   };
 
   const handleError = () => {
-    showError('Error!', 'Something went wrong');
+    showError("Error!", "Something went wrong");
   };
 
   const handleWarning = () => {
-    showWarning('Warning!', 'Please check your input');
+    showWarning("Warning!", "Please check your input");
   };
 
   const handleInfo = () => {
-    showInfo('Info', 'Here is some information');
+    showInfo("Info", "Here is some information");
   };
 
   return (
@@ -140,10 +140,10 @@ function MyComponent() {
 Displays the alerts in the UI. You can position it anywhere in your app.
 
 ```tsx
-import { AlertContainer } from '@koharx/core-ui';
+import { AlertContainer } from "@koharx/core-ui";
 
 // Position options: 'top-right', 'top-left', 'bottom-right', 'bottom-left', 'top-center', 'bottom-center'
-<AlertContainer position="top-right" />
+<AlertContainer position="top-right" />;
 ```
 
 ### Alert Types
@@ -156,12 +156,32 @@ import { AlertContainer } from '@koharx/core-ui';
 ### Alert Options
 
 ```tsx
-showSuccess('Title', 'Message', {
+showSuccess("Title", "Message", {
   duration: 3000, // Auto-dismiss after 3 seconds (0 = no auto-dismiss)
   dismissible: true, // Whether the alert can be manually dismissed
 });
 ```
 
+## Versioning
+
+This project follows [Semantic Versioning](https://semver.org/). For detailed information about versioning and release management, see [VERSIONING.md](./VERSIONING.md).
+
+### Quick Version Commands
+
+```bash
+# Patch release (bug fixes)
+npm run release:patch
+
+# Minor release (new features)
+npm run release:minor
+
+# Major release (breaking changes)
+npm run release:major
+
+# Beta release (for testing)
+npm run release:beta
+```
+
 ## License
 
-MIT 
+MIT
