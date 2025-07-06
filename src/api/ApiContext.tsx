@@ -1,12 +1,14 @@
-import {
+import React, {
   createContext,
   useContext,
   useCallback,
+  useMemo,
   type ReactNode,
   type FC,
 } from "react";
-import { ApiClient } from "./apiClient";
-import type { ApiContextType, ApiConfig } from "./types";
+import { createApiClient } from "./apiClient";
+import type { ApiConfig, ApiContextType } from "./types";
+import type { AxiosRequestConfig } from "axios";
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
 
@@ -16,56 +18,67 @@ interface ApiProviderProps {
 }
 
 export const ApiProvider: FC<ApiProviderProps> = ({ children, config }) => {
-  const apiClient = new ApiClient(config);
+  const apiClient = useMemo(() => createApiClient(config), [config]);
 
   const get = useCallback(
-    async <T = any,>(url: string, requestConfig?: any) => {
+    <T = unknown,>(url: string, requestConfig?: AxiosRequestConfig) => {
       return apiClient.get<T>(url, requestConfig);
     },
     [apiClient]
   );
 
   const post = useCallback(
-    async <T = any,>(url: string, data?: any, requestConfig?: any) => {
+    <T = unknown,>(
+      url: string,
+      data?: unknown,
+      requestConfig?: AxiosRequestConfig
+    ) => {
       return apiClient.post<T>(url, data, requestConfig);
     },
     [apiClient]
   );
 
   const put = useCallback(
-    async <T = any,>(url: string, data?: any, requestConfig?: any) => {
+    <T = unknown,>(
+      url: string,
+      data?: unknown,
+      requestConfig?: AxiosRequestConfig
+    ) => {
       return apiClient.put<T>(url, data, requestConfig);
     },
     [apiClient]
   );
 
   const patch = useCallback(
-    async <T = any,>(url: string, data?: any, requestConfig?: any) => {
+    <T = unknown,>(
+      url: string,
+      data?: unknown,
+      requestConfig?: AxiosRequestConfig
+    ) => {
       return apiClient.patch<T>(url, data, requestConfig);
     },
     [apiClient]
   );
 
-  const deleteRequest = useCallback(
-    async <T = any,>(url: string, requestConfig?: any) => {
+  const del = useCallback(
+    <T = unknown,>(url: string, requestConfig?: AxiosRequestConfig) => {
       return apiClient.delete<T>(url, requestConfig);
     },
     [apiClient]
   );
 
-  return (
-    <ApiContext.Provider
-      value={{
-        get,
-        post,
-        put,
-        patch,
-        delete: deleteRequest,
-      }}
-    >
-      {children}
-    </ApiContext.Provider>
+  const value = useMemo(
+    () => ({
+      get,
+      post,
+      put,
+      patch,
+      delete: del,
+    }),
+    [get, post, put, patch, del]
   );
+
+  return <ApiContext.Provider value={value}>{children}</ApiContext.Provider>;
 };
 
 export const useApi = () => {

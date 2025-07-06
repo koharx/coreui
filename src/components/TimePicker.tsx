@@ -4,8 +4,8 @@ import { TextFieldProps } from "@mui/material/TextField";
 
 interface TimePickerProps {
   label?: string;
-  value: any;
-  onChange: (value: any) => void;
+  value: Date | null;
+  onChange: (value: Date | null) => void;
   disabled?: boolean;
 }
 

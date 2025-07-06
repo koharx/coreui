@@ -1,30 +1,50 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
-interface UseFormOptions<T> {
-  initialValues: T;
-  onSubmit: (values: T) => void;
-}
-
-export function useForm<T extends Record<string, any>>({ initialValues, onSubmit }: UseFormOptions<T>) {
+export const useForm = <T extends Record<string, unknown>>(initialValues: T) => {
   const [values, setValues] = useState<T>(initialValues);
+  const [errors, setErrors] = useState<Partial<Record<keyof T, string>>>({});
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+  const handleChange = useCallback(
+    (name: keyof T, value: T[keyof T]) => {
+      setValues((prev) => ({ ...prev, [name]: value }));
+      // Clear error when user starts typing
+      if (errors[name]) {
+        setErrors((prev) => ({ ...prev, [name]: undefined }));
+      }
+    },
+    [errors]
+  );
+
+  const handleSubmit = useCallback(
+    (onSubmit: (values: T) => void) => {
+      return (e: React.FormEvent) => {
+        e.preventDefault();
+        onSubmit(values);
+      };
+    },
+    [values]
+  );
+
+  const reset = useCallback(() => {
+    setValues(initialValues);
+    setErrors({});
+  }, [initialValues]);
+
+  const setError = useCallback((name: keyof T, error: string) => {
+    setErrors((prev) => ({ ...prev, [name]: error }));
+  }, []);
+
+  const setFieldValue = useCallback((name: keyof T, value: T[keyof T]) => {
     setValues((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit(values);
-  };
-
-  const reset = () => setValues(initialValues);
+  }, []);
 
   return {
     values,
+    errors,
     handleChange,
     handleSubmit,
     reset,
-    setValues,
+    setError,
+    setFieldValue,
   };
-} 
+}; 

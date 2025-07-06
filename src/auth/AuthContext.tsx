@@ -12,9 +12,16 @@ import type { AuthState, LoginCredentials, AuthContextType } from "./types";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+interface ApiClient {
+  post: (
+    url: string,
+    data: unknown
+  ) => Promise<{ data: { accessToken: string } }>;
+}
+
 interface AuthProviderProps {
   children: ReactNode;
-  apiClient?: any; // Will be properly typed when we create the API client
+  apiClient?: ApiClient;
 }
 
 export const AuthProvider: FC<AuthProviderProps> = ({
@@ -118,7 +125,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({
     try {
       let response, data;
       if (apiClient) {
-        response = await apiClient.post("/api/auth/refresh");
+        response = await apiClient.post("/api/auth/refresh", {});
         data = response.data;
       } else {
         response = await fetch("/api/auth/refresh", {

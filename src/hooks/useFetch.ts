@@ -1,57 +1,71 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState, useEffect, useCallback } from "react";
 
-interface UseFetchResult<T> {
-  data: T | null;
-  error: Error | null;
-  loading: boolean;
-  refetch: () => void;
+interface FetchOptions {
+  method?: string;
+  headers?: Record<string, string>;
+  body?: string;
+  signal?: AbortSignal;
 }
 
-const cache = new Map<string, any>();
+interface FetchState<T> {
+  data: T | null;
+  loading: boolean;
+  error: string | null;
+}
 
-function useFetch<T = any>(url: string, options?: RequestInit): UseFetchResult<T> {
-  const [data, setData] = useState<T | null>(null);
-  const [error, setError] = useState<Error | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [reload, setReload] = useState(0);
-  const abortRef = useRef<AbortController | null>(null);
+interface UseFetchOptions {
+  immediate?: boolean;
+  dependencies?: unknown[];
+}
 
-  const refetch = () => setReload(r => r + 1);
+export const useFetch = <T = unknown>(
+  url: string,
+  options: FetchOptions = {},
+  fetchOptions: UseFetchOptions = {}
+) => {
+  const [state, setState] = useState<FetchState<T>>({
+    data: null,
+    loading: false,
+    error: null,
+  });
+
+  const fetchData = useCallback(async () => {
+    setState((prev) => ({ ...prev, loading: true, error: null }));
+
+    try {
+      const response = await fetch(url, {
+        method: options.method || "GET",
+        headers: {
+          "Content-Type": "application/json",
+          ...options.headers,
+        },
+        body: options.body,
+        signal: options.signal,
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setState({ data, loading: false, error: null });
+    } catch (error) {
+      setState({
+        data: null,
+        loading: false,
+        error: error instanceof Error ? error.message : "An error occurred",
+      });
+    }
+  }, [url, options.method, options.headers, options.body, options.signal]);
 
   useEffect(() => {
-    let ignore = false;
-    setLoading(true);
-    setError(null);
-    if (cache.has(url)) {
-      setData(cache.get(url));
-      setLoading(false);
-      return;
+    if (fetchOptions.immediate !== false) {
+      fetchData();
     }
-    abortRef.current = new AbortController();
-    fetch(url, { ...options, signal: abortRef.current.signal })
-      .then(res => {
-        if (!res.ok) throw new Error(res.statusText);
-        return res.json();
-      })
-      .then(json => {
-        if (!ignore) {
-          setData(json);
-          cache.set(url, json);
-        }
-      })
-      .catch(e => {
-        if (!ignore && e.name !== 'AbortError') setError(e);
-      })
-      .finally(() => {
-        if (!ignore) setLoading(false);
-      });
-    return () => {
-      ignore = true;
-      abortRef.current?.abort();
-    };
-  }, [url, reload]);
+  }, [fetchData, fetchOptions.immediate]);
 
-  return { data, error, loading, refetch };
-}
-
-export default useFetch; 
+  return {
+    ...state,
+    refetch: fetchData,
+  };
+}; 

@@ -1,71 +1,115 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
-import Snackbar from "@mui/material/Snackbar";
-import MuiAlert, { AlertColor } from "@mui/material/Alert";
+import React, { createContext, useContext, useState, useCallback } from "react";
+import { Snackbar, Alert, AlertColor } from "@mui/material";
+
+interface Toast {
+  id: string;
+  message: string;
+  severity: AlertColor;
+  duration?: number;
+}
 
 interface ToastContextType {
-  showToast: (message: string, severity?: AlertColor) => void;
-  showSuccess: (message: string) => void;
-  showError: (message: string) => void;
-  showInfo: (message: string) => void;
-  showWarning: (message: string) => void;
+  showToast: (
+    message: string,
+    severity?: AlertColor,
+    duration?: number
+  ) => void;
+  showSuccess: (message: string, duration?: number) => void;
+  showError: (message: string, duration?: number) => void;
+  showWarning: (message: string, duration?: number) => void;
+  showInfo: (message: string, duration?: number) => void;
+  clearToasts: () => void;
 }
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
-export const useToast = () => {
-  const context = useContext(ToastContext);
-  if (!context) throw new Error("useToast must be used within ToastProvider");
-  return context;
-};
+export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [toasts, setToasts] = useState<Toast[]>([]);
 
-interface ToastProviderProps {
-  children: ReactNode;
-}
+  const showToast = useCallback(
+    (message: string, severity: AlertColor = "info", duration = 6000) => {
+      const id = Math.random().toString(36).substr(2, 9);
+      const newToast: Toast = { id, message, severity, duration };
+      setToasts((prev) => [...prev, newToast]);
 
-const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
-  const [open, setOpen] = useState(false);
-  const [message, setMessage] = useState("");
-  const [severity, setSeverity] = useState<AlertColor>("info");
+      setTimeout(() => {
+        setToasts((prev) => prev.filter((toast) => toast.id !== id));
+      }, duration);
+    },
+    []
+  );
 
-  const showToast = (msg: string, sev: AlertColor = "info") => {
-    setMessage(msg);
-    setSeverity(sev);
-    setOpen(true);
-  };
+  const showSuccess = useCallback(
+    (message: string, duration?: number) =>
+      showToast(message, "success", duration),
+    [showToast]
+  );
 
-  const showSuccess = (msg: string) => showToast(msg, "success");
-  const showError = (msg: string) => showToast(msg, "error");
-  const showInfo = (msg: string) => showToast(msg, "info");
-  const showWarning = (msg: string) => showToast(msg, "warning");
+  const showError = useCallback(
+    (message: string, duration?: number) =>
+      showToast(message, "error", duration),
+    [showToast]
+  );
 
-  const handleClose = (_: any, reason?: string) => {
-    if (reason === "clickaway") return;
-    setOpen(false);
+  const showWarning = useCallback(
+    (message: string, duration?: number) =>
+      showToast(message, "warning", duration),
+    [showToast]
+  );
+
+  const showInfo = useCallback(
+    (message: string, duration?: number) =>
+      showToast(message, "info", duration),
+    [showToast]
+  );
+
+  const clearToasts = useCallback(() => {
+    setToasts([]);
+  }, []);
+
+  const handleClose = (id: string) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
   };
 
   return (
     <ToastContext.Provider
-      value={{ showToast, showSuccess, showError, showInfo, showWarning }}
+      value={{
+        showToast,
+        showSuccess,
+        showError,
+        showWarning,
+        showInfo,
+        clearToasts,
+      }}
     >
       {children}
-      <Snackbar
-        open={open}
-        autoHideDuration={4000}
-        onClose={handleClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        <MuiAlert
-          onClose={handleClose}
-          severity={severity}
-          sx={{ width: "100%" }}
-          elevation={6}
-          variant="filled"
+      {toasts.map((toast) => (
+        <Snackbar
+          key={toast.id}
+          open={true}
+          autoHideDuration={toast.duration}
+          onClose={() => handleClose(toast.id)}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
         >
-          {message}
-        </MuiAlert>
-      </Snackbar>
+          <Alert
+            onClose={() => handleClose(toast.id)}
+            severity={toast.severity}
+            sx={{ width: "100%" }}
+          >
+            {toast.message}
+          </Alert>
+        </Snackbar>
+      ))}
     </ToastContext.Provider>
   );
 };
 
-export default ToastProvider;
+export const useToast = () => {
+  const context = useContext(ToastContext);
+  if (context === undefined) {
+    throw new Error("useToast must be used within a ToastProvider");
+  }
+  return context;
+};

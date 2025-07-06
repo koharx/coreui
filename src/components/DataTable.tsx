@@ -1,45 +1,53 @@
 import React from "react";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+} from "@mui/material";
 
-interface Column {
-  label: string;
-  field: string;
+interface DataTableProps<T> {
+  data: T[];
+  columns: {
+    key: keyof T;
+    label: string;
+    render?: (value: T[keyof T], row: T) => React.ReactNode;
+  }[];
 }
 
-interface DataTableProps {
-  columns: Column[];
-  rows: Record<string, any>[];
-  pagination?: React.ReactNode;
-}
-
-const DataTable: React.FC<DataTableProps> = ({ columns, rows, pagination }) => (
-  <TableContainer component={Paper}>
-    <Table>
-      <TableHead>
-        <TableRow>
-          {columns.map((col) => (
-            <TableCell key={col.field}>{col.label}</TableCell>
-          ))}
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {rows.map((row, idx) => (
-          <TableRow key={idx}>
-            {columns.map((col) => (
-              <TableCell key={col.field}>{row[col.field]}</TableCell>
+const DataTable = <T extends Record<string, unknown>>({
+  data,
+  columns,
+}: DataTableProps<T>) => {
+  return (
+    <TableContainer component={Paper}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            {columns.map((column) => (
+              <TableCell key={String(column.key)}>{column.label}</TableCell>
             ))}
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-    {pagination}
-  </TableContainer>
-);
+        </TableHead>
+        <TableBody>
+          {data.map((row, index) => (
+            <TableRow key={index}>
+              {columns.map((column) => (
+                <TableCell key={String(column.key)}>
+                  {column.render
+                    ? column.render(row[column.key], row)
+                    : String(row[column.key])}
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+};
 
 export default DataTable;

@@ -1,10 +1,12 @@
+import { AxiosRequestConfig } from 'axios';
+
 export interface ApiConfig {
   baseURL: string;
   timeout?: number;
   headers?: Record<string, string>;
 }
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   data: T;
   status: number;
   statusText: string;
@@ -18,9 +20,9 @@ export interface ApiError {
 }
 
 export interface ApiContextType {
-  get: <T = any>(url: string, config?: any) => Promise<ApiResponse<T>>;
-  post: <T = any>(url: string, data?: any, config?: any) => Promise<ApiResponse<T>>;
-  put: <T = any>(url: string, data?: any, config?: any) => Promise<ApiResponse<T>>;
-  patch: <T = any>(url: string, data?: any, config?: any) => Promise<ApiResponse<T>>;
-  delete: <T = any>(url: string, config?: any) => Promise<ApiResponse<T>>;
+  get: <T = unknown>(url: string, config?: AxiosRequestConfig) => Promise<ApiResponse<T>>;
+  post: <T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig) => Promise<ApiResponse<T>>;
+  put: <T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig) => Promise<ApiResponse<T>>;
+  patch: <T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig) => Promise<ApiResponse<T>>;
+  delete: <T = unknown>(url: string, config?: AxiosRequestConfig) => Promise<ApiResponse<T>>;
 } 

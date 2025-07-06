@@ -1,69 +1,111 @@
-import {
-  createContext,
-  useContext,
-  useCallback,
-  useRef,
-  type ReactNode,
-  type FC,
-} from "react";
-import { Logger } from "./logger";
-import type { LoggerContextType, LogLevel, LoggerConfig } from "./types";
+import React, { createContext, useContext, useState, useCallback } from "react";
+import { createLogger, LoggerImpl } from "./logger";
+import { LogLevel, LogEntry, LoggerConfig } from "./types";
+
+interface LoggerContextType {
+  logger: LoggerImpl;
+  logs: LogEntry[];
+  setLevel: (level: LogLevel) => void;
+  clearLogs: () => void;
+  debug: (message: string, context?: Record<string, unknown>) => void;
+  info: (message: string, context?: Record<string, unknown>) => void;
+  warn: (message: string, context?: Record<string, unknown>) => void;
+  error: (
+    message: string,
+    error?: Error,
+    context?: Record<string, unknown>
+  ) => void;
+  fatal: (
+    message: string,
+    error?: Error,
+    context?: Record<string, unknown>
+  ) => void;
+}
 
 const LoggerContext = createContext<LoggerContextType | undefined>(undefined);
 
 interface LoggerProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
   config?: LoggerConfig;
 }
 
-export const LoggerProvider: FC<LoggerProviderProps> = ({
+export const LoggerProvider: React.FC<LoggerProviderProps> = ({
   children,
-  config,
+  config = {
+    level: LogLevel.INFO,
+    enableConsole: true,
+    enableFile: false,
+  },
 }) => {
-  const loggerRef = useRef<Logger>(new Logger(config));
+  const [logger] = useState(() => createLogger(config) as LoggerImpl);
+  const [logs, setLogs] = useState<LogEntry[]>([]);
 
-  const log = useCallback((level: LogLevel, message: string, data?: any) => {
-    loggerRef.current.log(level, message, data);
-  }, []);
-
-  const debug = useCallback((message: string, data?: any) => {
-    loggerRef.current.debug(message, data);
-  }, []);
-
-  const info = useCallback((message: string, data?: any) => {
-    loggerRef.current.info(message, data);
-  }, []);
-
-  const warn = useCallback((message: string, data?: any) => {
-    loggerRef.current.warn(message, data);
-  }, []);
-
-  const error = useCallback((message: string, error?: Error, data?: any) => {
-    loggerRef.current.error(message, error, data);
-  }, []);
-
-  const getLogs = useCallback((level?: LogLevel) => {
-    return loggerRef.current.getLogs(level);
-  }, []);
+  const setLevel = useCallback(
+    (level: LogLevel) => {
+      logger.setLevel(level);
+    },
+    [logger]
+  );
 
   const clearLogs = useCallback(() => {
-    loggerRef.current.clearLogs();
-  }, []);
+    logger.clearLogs();
+    setLogs([]);
+  }, [logger]);
+
+  const debug = useCallback(
+    (message: string, context?: Record<string, unknown>) => {
+      logger.debug(message, context);
+      setLogs([...logger.getLogs()]);
+    },
+    [logger]
+  );
+
+  const info = useCallback(
+    (message: string, context?: Record<string, unknown>) => {
+      logger.info(message, context);
+      setLogs([...logger.getLogs()]);
+    },
+    [logger]
+  );
+
+  const warn = useCallback(
+    (message: string, context?: Record<string, unknown>) => {
+      logger.warn(message, context);
+      setLogs([...logger.getLogs()]);
+    },
+    [logger]
+  );
+
+  const error = useCallback(
+    (message: string, error?: Error, context?: Record<string, unknown>) => {
+      logger.error(message, error, context);
+      setLogs([...logger.getLogs()]);
+    },
+    [logger]
+  );
+
+  const fatal = useCallback(
+    (message: string, error?: Error, context?: Record<string, unknown>) => {
+      logger.fatal(message, error, context);
+      setLogs([...logger.getLogs()]);
+    },
+    [logger]
+  );
+
+  const value = {
+    logger,
+    logs,
+    setLevel,
+    clearLogs,
+    debug,
+    info,
+    warn,
+    error,
+    fatal,
+  };
 
   return (
-    <LoggerContext.Provider
-      value={{
-        log,
-        debug,
-        info,
-        warn,
-        error,
-        getLogs,
-        clearLogs,
-      }}
-    >
-      {children}
-    </LoggerContext.Provider>
+    <LoggerContext.Provider value={value}>{children}</LoggerContext.Provider>
   );
 };
 

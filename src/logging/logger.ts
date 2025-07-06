@@ -1,124 +1,109 @@
-import type { LogLevel, LogEntry, LoggerConfig } from './types';
+import { LogLevel, LogEntry, LoggerConfig, Logger } from "./types";
 
-export class Logger {
+export class LoggerImpl implements Logger {
   private config: LoggerConfig;
   private logs: LogEntry[] = [];
 
-  constructor(config: LoggerConfig = {}) {
-    this.config = {
-      level: 'info',
-      enableConsole: true,
-      enableStorage: true,
-      maxEntries: 1000,
-      ...config,
-    };
+  constructor(config: LoggerConfig) {
+    this.config = config;
   }
 
   private shouldLog(level: LogLevel): boolean {
-    const levels: LogLevel[] = ['debug', 'info', 'warn', 'error'];
-    const configLevel = this.config.level || 'info';
-    return levels.indexOf(level) >= levels.indexOf(configLevel);
+    return level >= this.config.level;
   }
 
-  private addLog(entry: LogEntry) {
-    this.logs.push(entry);
-
-    // Keep only the latest entries
-    if (this.config.maxEntries && this.logs.length > this.config.maxEntries) {
-      this.logs = this.logs.slice(-this.config.maxEntries);
-    }
-
-    // Store in localStorage if enabled
-    if (this.config.enableStorage) {
-      try {
-        const storedLogs = localStorage.getItem('app_logs');
-        const logs = storedLogs ? JSON.parse(storedLogs) : [];
-        logs.push({
-          ...entry,
-          timestamp: entry.timestamp.toISOString(),
-        });
-        
-        // Keep only the latest entries in storage too
-        if (this.config.maxEntries && logs.length > this.config.maxEntries) {
-          logs.splice(0, logs.length - this.config.maxEntries);
-        }
-        
-        localStorage.setItem('app_logs', JSON.stringify(logs));
-      } catch (error) {
-        console.warn('Failed to store log in localStorage:', error);
-      }
-    }
+  private formatMessage(level: LogLevel, message: string, context?: Record<string, unknown>): string {
+    const timestamp = new Date().toISOString();
+    const levelName = LogLevel[level];
+    const contextStr = context ? ` ${JSON.stringify(context)}` : "";
+    return `[${timestamp}] ${levelName}: ${message}${contextStr}`;
   }
 
-  log(level: LogLevel, message: string, data?: any) {
+  private addLog(level: LogLevel, message: string, context?: Record<string, unknown>, error?: Error): void {
     if (!this.shouldLog(level)) return;
 
-    const entry: LogEntry = {
+    const logEntry: LogEntry = {
       level,
       message,
       timestamp: new Date(),
-      data,
-    };
-
-    this.addLog(entry);
-
-    if (this.config.enableConsole) {
-      const consoleMethod = level === 'debug' ? 'debug' : level;
-      if (data) {
-        console[consoleMethod](message, data);
-      } else {
-        console[consoleMethod](message);
-      }
-    }
-  }
-
-  debug(message: string, data?: any) {
-    this.log('debug', message, data);
-  }
-
-  info(message: string, data?: any) {
-    this.log('info', message, data);
-  }
-
-  warn(message: string, data?: any) {
-    this.log('warn', message, data);
-  }
-
-  error(message: string, error?: Error, data?: any) {
-    const entry: LogEntry = {
-      level: 'error',
-      message,
-      timestamp: new Date(),
+      context,
       error,
-      data,
     };
 
-    this.addLog(entry);
+    this.logs.push(logEntry);
 
     if (this.config.enableConsole) {
-      if (error) {
-        console.error(message, error, data);
-      } else {
-        console.error(message, data);
+      const formattedMessage = this.formatMessage(level, message, context);
+      
+      switch (level) {
+        case LogLevel.DEBUG:
+          console.debug(formattedMessage);
+          break;
+        case LogLevel.INFO:
+          console.info(formattedMessage);
+          break;
+        case LogLevel.WARN:
+          console.warn(formattedMessage);
+          break;
+        case LogLevel.ERROR:
+        case LogLevel.FATAL:
+          console.error(formattedMessage);
+          if (error) {
+            console.error(error);
+          }
+          break;
       }
+    }
+
+    // Keep only the latest logs if maxEntries is set
+    if (this.config.maxFileSize && this.logs.length > this.config.maxFileSize) {
+      this.logs = this.logs.slice(-this.config.maxFileSize);
     }
   }
 
-  getLogs(level?: LogLevel): LogEntry[] {
-    if (level) {
-      return this.logs.filter(log => log.level === level);
-    }
+  debug(message: string, context?: Record<string, unknown>): void {
+    this.addLog(LogLevel.DEBUG, message, context);
+  }
+
+  info(message: string, context?: Record<string, unknown>): void {
+    this.addLog(LogLevel.INFO, message, context);
+  }
+
+  warn(message: string, context?: Record<string, unknown>): void {
+    this.addLog(LogLevel.WARN, message, context);
+  }
+
+  error(message: string, error?: Error, context?: Record<string, unknown>): void {
+    this.addLog(LogLevel.ERROR, message, context, error);
+  }
+
+  fatal(message: string, error?: Error, context?: Record<string, unknown>): void {
+    this.addLog(LogLevel.FATAL, message, context, error);
+  }
+
+  setLevel(level: LogLevel): void {
+    this.config.level = level;
+  }
+
+  getLevel(): LogLevel {
+    return this.config.level;
+  }
+
+  getLogs(): LogEntry[] {
     return [...this.logs];
   }
 
-  clearLogs() {
+  clearLogs(): void {
     this.logs = [];
-    if (this.config.enableStorage) {
-      localStorage.removeItem('app_logs');
-    }
   }
 }
 
-export const createLogger = (config?: LoggerConfig): Logger => {
-  return new Logger(config);
-}; 
+export const createLogger = (config: LoggerConfig): Logger => {
+  return new LoggerImpl(config);
+};
+
+export const defaultLogger = createLogger({
+  level: LogLevel.INFO,
+  enableConsole: true,
+  enableFile: false,
+}); 
