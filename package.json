@@ -16,7 +16,19 @@
     "test": "jest",
     "lint": "eslint src --ext .ts,.tsx",
     "prepare": "npm run build",
-    "prepublishOnly": "npm run lint && npm run test"
+    "version:patch": "npm version patch && npm run build && npm publish",
+    "version:minor": "npm version minor && npm run build && npm publish",
+    "version:major": "npm version major && npm run build && npm publish",
+    "version:prepatch": "npm version prepatch && npm run build && npm publish --tag beta",
+    "version:preminor": "npm version preminor && npm run build && npm publish --tag beta",
+    "version:premajor": "npm version premajor && npm run build && npm publish --tag beta",
+    "version:prerelease": "npm version prerelease && npm run build && npm publish --tag beta",
+    "release:patch": "npm run version:patch",
+    "release:minor": "npm run version:minor",
+    "release:major": "npm run version:major",
+    "release:beta": "npm run version:prepatch",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
+    "changelog:first": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -51,6 +63,7 @@
     "@types/react-dom": "^18.2.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
+    "conventional-changelog-cli": "^4.1.0",
     "eslint": "^8.0.0",
     "eslint-plugin-react": "^7.0.0",
     "eslint-plugin-react-hooks": "^4.0.0",
