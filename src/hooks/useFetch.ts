@@ -1,120 +1,57 @@
-import { useState, useCallback, useRef } from 'react';
-import axiosInstance from '../utils/axios';
-import { useAlert } from '../contexts/AlertContext';
-import { logError } from '../utils/logger';
+import { useEffect, useRef, useState } from 'react';
 
-interface FetchState<T> {
+interface UseFetchResult<T> {
   data: T | null;
-  loading: boolean;
   error: Error | null;
+  loading: boolean;
+  refetch: () => void;
 }
 
-interface FetchOptions extends Omit<RequestInit, 'body'> {
-  body?: any;
-  cacheTime?: number;
-}
+const cache = new Map<string, any>();
 
-interface UseFetchReturn<T> extends FetchState<T> {
-  fetchData: (url: string, options?: FetchOptions) => Promise<void>;
-  reset: () => void;
-  refetch: () => Promise<void>;
-}
+function useFetch<T = any>(url: string, options?: RequestInit): UseFetchResult<T> {
+  const [data, setData] = useState<T | null>(null);
+  const [error, setError] = useState<Error | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [reload, setReload] = useState(0);
+  const abortRef = useRef<AbortController | null>(null);
 
-const cache = new Map<string, { data: any; timestamp: number }>();
+  const refetch = () => setReload(r => r + 1);
 
-export const useFetch = <T>(): UseFetchReturn<T> => {
-  const [state, setState] = useState<FetchState<T>>({
-    data: null,
-    loading: false,
-    error: null,
-  });
-
-  const lastUrlRef = useRef<string>('');
-  const lastOptionsRef = useRef<FetchOptions>({});
-
-  const { showError } = useAlert();
-
-  const fetchData = useCallback(async (url: string, options: FetchOptions = {}) => {
-    const cacheKey = `${url}-${JSON.stringify(options)}`;
-    const cachedData = cache.get(cacheKey);
-    const now = Date.now();
-
-    if (cachedData && options.cacheTime && now - cachedData.timestamp < options.cacheTime) {
-      setState({
-        data: cachedData.data,
-        loading: false,
-        error: null,
-      });
+  useEffect(() => {
+    let ignore = false;
+    setLoading(true);
+    setError(null);
+    if (cache.has(url)) {
+      setData(cache.get(url));
+      setLoading(false);
       return;
     }
-
-    setState(prev => ({ ...prev, loading: true, error: null }));
-    lastUrlRef.current = url;
-    lastOptionsRef.current = options;
-    
-    try {
-      let headers: { [key: string]: string } = { 'Content-Type': 'application/json' };
-      if (options.headers) {
-        if (options.headers instanceof Headers) {
-          options.headers.forEach((value, key) => {
-            headers[key] = value;
-          });
-        } else if (typeof options.headers === 'object' && !Array.isArray(options.headers)) {
-          headers = { ...headers, ...options.headers };
+    abortRef.current = new AbortController();
+    fetch(url, { ...options, signal: abortRef.current.signal })
+      .then(res => {
+        if (!res.ok) throw new Error(res.statusText);
+        return res.json();
+      })
+      .then(json => {
+        if (!ignore) {
+          setData(json);
+          cache.set(url, json);
         }
-      }
-      const { body, cache: fetchCache, credentials, integrity, keepalive, method, mode, redirect, referrer, referrerPolicy, signal, ...axiosOptions } = options;
-      const response = await axiosInstance({
-        url,
-        ...axiosOptions,
-        headers,
-        data: body,
-        method,
+      })
+      .catch(e => {
+        if (!ignore && e.name !== 'AbortError') setError(e);
+      })
+      .finally(() => {
+        if (!ignore) setLoading(false);
       });
-      
-      const data = response.data as T;
-      
-      if (options.cacheTime) {
-        cache.set(cacheKey, { data, timestamp: now });
-      }
+    return () => {
+      ignore = true;
+      abortRef.current?.abort();
+    };
+  }, [url, reload]);
 
-      setState({
-        data,
-        loading: false,
-        error: null,
-      });
-    } catch (error) {
-      const err = error as Error;
-      logError(err, 'Fetch Error');
-      showError(err.message || 'An error occurred while fetching data');
-      setState({
-        data: null,
-        loading: false,
-        error: err,
-      });
-    }
-  }, [showError]);
+  return { data, error, loading, refetch };
+}
 
-  const refetch = useCallback(async () => {
-    if (lastUrlRef.current) {
-      await fetchData(lastUrlRef.current, lastOptionsRef.current);
-    }
-  }, [fetchData]);
-
-  const reset = useCallback(() => {
-    setState({
-      data: null,
-      loading: false,
-      error: null,
-    });
-    lastUrlRef.current = '';
-    lastOptionsRef.current = {};
-  }, []);
-
-  return {
-    ...state,
-    fetchData,
-    reset,
-    refetch,
-  };
-}; 
+export default useFetch; 
