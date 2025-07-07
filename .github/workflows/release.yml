@@ -35,32 +35,64 @@ jobs:
       - name: Check for conventional commits
         id: check
         run: |
-          # Get the latest tag, or use a default if no tags exist
-          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "HEAD~10")
+          echo "Checking for conventional commits..."
 
-          # Check for conventional commits since the last tag
-          if git log --oneline $LATEST_TAG..HEAD | grep -qE "^(feat|fix|BREAKING CHANGE)"; then
+          # Check if we have any tags
+          if git tag --list | grep -q .; then
+            # We have tags, get the latest one
+            LATEST_TAG=$(git describe --tags --abbrev=0)
+            echo "Latest tag: $LATEST_TAG"
+            COMMIT_RANGE="$LATEST_TAG..HEAD"
+          else
+            # No tags exist, check last 10 commits
+            echo "No tags found, checking last 10 commits"
+            COMMIT_RANGE="HEAD~10..HEAD"
+          fi
+
+          # Show recent commits
+          echo "Recent commits in range $COMMIT_RANGE:"
+          git log --oneline $COMMIT_RANGE || echo "No commits in range"
+
+          # Check for conventional commits
+          CONVENTIONAL_COMMITS=$(git log --oneline $COMMIT_RANGE 2>/dev/null | grep -E "^(feat|fix|BREAKING CHANGE)" || echo "")
+
+          if [ -n "$CONVENTIONAL_COMMITS" ]; then
+            echo "Found conventional commits:"
+            echo "$CONVENTIONAL_COMMITS"
             echo "has_conventional_commits=true" >> $GITHUB_OUTPUT
           else
+            echo "No conventional commits found."
             echo "has_conventional_commits=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Version and Release
         if: steps.check.outputs.has_conventional_commits == 'true'
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          echo "Starting version and release process..."
 
-          # Get the latest tag, or use a default if no tags exist
-          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "HEAD~10")
+          git config --local user.email "harshad.karemore@gmail.com"
+          git config --local user.name "Harshad Karemore"
 
-          # Determine version bump type based on commit messages since last tag
-          if git log --oneline $LATEST_TAG..HEAD | grep -q "BREAKING CHANGE"; then
+          # Check if we have any tags
+          if git tag --list | grep -q .; then
+            # We have tags, get the latest one
+            LATEST_TAG=$(git describe --tags --abbrev=0)
+            COMMIT_RANGE="$LATEST_TAG..HEAD"
+          else
+            # No tags exist, check last 10 commits
+            COMMIT_RANGE="HEAD~10..HEAD"
+          fi
+
+          # Determine version bump type based on commit messages
+          if git log --oneline $COMMIT_RANGE 2>/dev/null | grep -q "BREAKING CHANGE"; then
             VERSION_TYPE="major"
-          elif git log --oneline $LATEST_TAG..HEAD | grep -q "^feat"; then
+            echo "Bumping major version"
+          elif git log --oneline $COMMIT_RANGE 2>/dev/null | grep -q "^feat"; then
             VERSION_TYPE="minor"
+            echo "Bumping minor version"
           else
             VERSION_TYPE="patch"
+            echo "Bumping patch version"
           fi
 
           # Bump version
@@ -68,6 +100,7 @@ jobs:
 
           # Get new version
           NEW_VERSION=$(node -p "require('./package.json').version")
+          echo "New version: $NEW_VERSION"
 
           # Generate changelog
           npm run changelog
