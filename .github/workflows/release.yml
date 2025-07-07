@@ -54,7 +54,7 @@ jobs:
           git log --oneline $COMMIT_RANGE || echo "No commits in range"
 
           # Check for conventional commits
-          CONVENTIONAL_COMMITS=$(git log --oneline $COMMIT_RANGE 2>/dev/null | grep -E "^(feat|fix|BREAKING CHANGE)" || echo "")
+          CONVENTIONAL_COMMITS=$(git log --oneline $COMMIT_RANGE 2>/dev/null | grep -E "^[a-f0-9]+ (feat|fix|BREAKING CHANGE)" || echo "")
 
           if [ -n "$CONVENTIONAL_COMMITS" ]; then
             echo "Found conventional commits:"
