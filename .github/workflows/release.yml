@@ -35,7 +35,11 @@ jobs:
       - name: Check for conventional commits
         id: check
         run: |
-          if git log --oneline -1 | grep -qE "^(feat|fix|BREAKING CHANGE)"; then
+          # Get the latest tag, or use a default if no tags exist
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "HEAD~10")
+
+          # Check for conventional commits since the last tag
+          if git log --oneline $LATEST_TAG..HEAD | grep -qE "^(feat|fix|BREAKING CHANGE)"; then
             echo "has_conventional_commits=true" >> $GITHUB_OUTPUT
           else
             echo "has_conventional_commits=false" >> $GITHUB_OUTPUT
@@ -47,10 +51,13 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
 
-          # Determine version bump type based on commit messages
-          if git log --oneline -1 | grep -q "BREAKING CHANGE"; then
+          # Get the latest tag, or use a default if no tags exist
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "HEAD~10")
+
+          # Determine version bump type based on commit messages since last tag
+          if git log --oneline $LATEST_TAG..HEAD | grep -q "BREAKING CHANGE"; then
             VERSION_TYPE="major"
-          elif git log --oneline -1 | grep -q "^feat"; then
+          elif git log --oneline $LATEST_TAG..HEAD | grep -q "^feat"; then
             VERSION_TYPE="minor"
           else
             VERSION_TYPE="patch"
