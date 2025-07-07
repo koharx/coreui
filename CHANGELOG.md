@@ -1,31 +1,16 @@
-# Changelog
+## 1.0.1 (2025-07-07)
 
-All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+### Bug Fixes
 
-## [Unreleased]
+* improve conventional commit detection in release workflow ([ed0e469](https://github.com/khuniverse/core-ui/commit/ed0e469d072dce3fb3e317b2a342093880e14fc2))
+* updated release action write access ([5f451f9](https://github.com/khuniverse/core-ui/commit/5f451f980879a388b1d1deafbcf2045db900b446))
+* updated release file ([f1ed45c](https://github.com/khuniverse/core-ui/commit/f1ed45ce97d3e4f58086547dd8402db6003738a6))
 
-### Added
 
-- Initial release with authentication system
-- API client with axios integration
-- Logging system with different log levels
-- Alert system with Material-UI components
-- Utility hooks (useLocalStorage, useSessionStorage, useDebounce, useThrottle, etc.)
-- UI components (DataTable, DatePicker, Modal, Tabs, etc.)
-- Full TypeScript support
+### Features
 
-## [1.0.0] - 2025-07-06
+* add test section to README ([97e3544](https://github.com/khuniverse/core-ui/commit/97e35446a6dec36fa860ad3ce2e8913868e77fed))
 
-### Added
 
-- Initial release of @koharx/core-ui
-- Authentication context and hooks
-- API client with request/response interceptors
-- Logging system with multiple log levels
-- Alert system with Material-UI integration
-- Comprehensive set of utility hooks
-- UI components library
-- TypeScript definitions for all components and hooks
+
