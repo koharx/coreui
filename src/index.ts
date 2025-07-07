@@ -52,4 +52,7 @@ export { useForm } from './hooks/useForm';
 export { useField } from './hooks/useField';
 
 // Utils
-export { formatDate, parseDate, addDays, isBefore, isAfter } from './utils/date'; 
+export { formatDate, parseDate, addDays, isBefore, isAfter } from './utils/date';
+
+// State management utilities are no longer exported. Please import Zustand directly in your callee project if needed.
+export { create } from 'zustand'; 
