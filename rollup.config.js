@@ -50,4 +50,14 @@ export default {
     'axios',
     'jwt-decode',
   ],
+  onwarn(warning, warn) {
+    // Suppress "use client" directive warnings
+    if (
+      warning.code === "MODULE_LEVEL_DIRECTIVE" &&
+      warning.message.includes('"use client"')
+    ) {
+      return;
+    }
+    warn(warning);
+  },
 }; 

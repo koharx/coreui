@@ -26,7 +26,7 @@ export { default as useMediaQuery } from './hooks/useMediaQuery';
 export { default as useOnlineStatus } from './hooks/useOnlineStatus';
 export { default as useClipboard } from './hooks/useClipboard';
 export { default as useInView } from './hooks/useInView';
-export { default as useFetch } from './hooks/useFetch';
+export { useFetch } from './hooks/useFetch';
 
 // Components
 export { default as Modal } from './components/Modal';
@@ -38,7 +38,7 @@ export { default as Tabs } from './components/Tabs';
 export { default as Pagination } from './components/Pagination';
 export { default as DataTable } from './components/DataTable';
 export { default as ThemeProvider, useThemeMode } from './components/ThemeProvider';
-export { default as ToastProvider, useToast } from './components/ToastProvider';
+export { ToastProvider, useToast } from './components/ToastProvider';
 export { default as DatePicker } from './components/DatePicker';
 export { default as TimePicker } from './components/TimePicker';
 export { default as Accordion } from './components/Accordion';
