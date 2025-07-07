@@ -33,3 +33,7 @@ yarn-debug.log*
 # Test reports
 coverage
 .nyc_output 
+
+dist/
+
+dist/index.d.ts
