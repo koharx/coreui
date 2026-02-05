@@ -4,8 +4,10 @@ import type { ApiConfig, ApiResponse } from './types';
 export class ApiClient {
   private instance: AxiosInstance;
   private token: string | null = null;
+  private onUnauthorized?: () => void;
 
   constructor(config: ApiConfig) {
+    this.onUnauthorized = config.onUnauthorized;
     this.instance = axios.create({
       baseURL: config.baseURL,
       timeout: config.timeout || 10000,
@@ -39,6 +41,7 @@ export class ApiClient {
         if (error.response?.status === 401) {
           // Handle token refresh or logout
           this.token = null;
+          this.onUnauthorized?.();
         }
         return Promise.reject(error);
       }

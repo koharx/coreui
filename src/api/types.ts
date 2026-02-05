@@ -4,6 +4,7 @@ export interface ApiConfig {
   baseURL: string;
   timeout?: number;
   headers?: Record<string, string>;
+  onUnauthorized?: () => void;
 }
 
 export interface ApiResponse<T = unknown> {
